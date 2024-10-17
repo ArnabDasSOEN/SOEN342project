@@ -12,8 +12,12 @@ public class Offering {
     private Schedule schedule;
     private Instructor instructor;
     private ArrayList<Booking> bookings;
+    private Location location;
+
+    
+
     public Offering(LessonType lessonType, boolean isGroup, boolean availability, int capacity, int startTime,
-            int endTime, Schedule schedule, Instructor instructor, ArrayList<Booking> bookings) {
+            int endTime, Schedule schedule, Instructor instructor, ArrayList<Booking> bookings, Location location) {
         this.lessonType = lessonType;
         this.isGroup = isGroup;
         this.availability = availability;
@@ -23,6 +27,7 @@ public class Offering {
         this.schedule = schedule;
         this.instructor = instructor;
         this.bookings = bookings;
+        this.location = location;
     }
     public LessonType getLessonType() {
         return lessonType;
@@ -78,8 +83,14 @@ public class Offering {
     public void setBookings(ArrayList<Booking> bookings) {
         this.bookings = bookings;
     }
-
+    public Location getLocation() {
+        return location;
+    }
+    public void setLocation(Location location) {
+        this.location = location;
+    }
     public boolean hasInstructor(){
         return this.instructor == null;
     }
+    public boolean equals(Location l, Schedule s, int startTime)
 }
