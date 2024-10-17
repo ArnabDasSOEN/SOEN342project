@@ -1,0 +1,27 @@
+#### Operation Name
+`takeOffering(offering)`
+
+#### Cross References
+- Use Case: "Process Offerings"
+
+#### Preconditions
+- The **Instructor** is logged into the system.
+- The **offering** is selected from the **potentialOfferings** list.
+- The **offering** exists in the system.
+
+#### Postconditions
+1. **If the offering already has an instructor assigned**:
+   - No changes are made to the **offering**.
+   - A message is returned to the **Instructor**: "The offering is unavailable."
+
+2. **If the offering does not have an instructor assigned**:
+   - The `instructor` attribute of the **offering** is updated to the **logged-in Instructor**.
+   - The **offering** is assigned to the **Instructor's** list of offerings.
+   - A success message is returned to the **Instructor**: "Offering successfully taken."
+
+#### State Changes
+- **If successful**:
+  - The **offering**'s `instructor` attribute is updated.
+  - The **Instructor's** list of assigned offerings is updated to include the new **offering**.
+- **If unsuccessful**:
+  - No state changes occur.

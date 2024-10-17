@@ -1,0 +1,19 @@
+### Operation Name
+`requestCreateOffering(Location L, Schedule S, startTime, endTime, mode, capacity, lessonType)`
+
+### Cross References
+- Use Case: "Process Offerings"
+
+### Preconditions
+- The **Administrator** is logged into the system.
+- The **Location** and **Schedule** are valid and exist in the system.
+
+### Postconditions
+- **If an offering with the same attributes exists**:
+  - No new **Offering** is created.
+  - A message is sent back to the **Administrator**: "Offering already exists and was not created."
+
+- **If no offering with the same attributes exists**:
+  - A new **Offering** is created with the attributes: `Location`, `Schedule`, `startTime`, `endTime`, `mode`, `capacity`, `lessonType`.
+  - The new **Offering** is added to the **Offering Collection**.
+  - A confirmation message is sent back to the **Administrator**: "Offering successfully created."
