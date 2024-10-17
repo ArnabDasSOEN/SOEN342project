@@ -1,0 +1,20 @@
+#### Operation Name
+`viewPotentialOfferings()`
+
+#### Cross References
+- Use Case: "Process Offerings"
+
+#### Preconditions
+- The **Instructor** is logged into the system.
+- The **Instructor's** attributes (`availableLocations` and `specialization`) are accessible.
+
+#### Postconditions
+1. **If matching offerings are found**:
+   - A list of **potentialOfferings** is returned, containing all **Offerings** that match the `availableLocations` and `specialization`.
+   
+2. **If no matching offerings are found**:
+   - An empty list is returned.
+   - A message is provided indicating that no potential offerings are available matching the criteria.
+
+#### State Changes
+- No system state changes occur, as this is a read-only operation.
