@@ -3,49 +3,52 @@ package Model;
 import java.util.ArrayList;
 
 public class Client {
-    private String name;
-    private String phoneNumber;
-    private int age;
-    private ArrayList<Booking> bookings;
-    
-    public Client(String name, String phoneNumber, int age) {
-        this.name = name;
-        this.phoneNumber = phoneNumber;
-        this.age = age;
-        this.bookings = new ArrayList<>();
-    }
+	private String name;
+	private String phoneNumber;
+	private int age;
+	private ArrayList<Booking> bookings;
 
-    public String getName() {
-        return name;
-    }
+	public Client(String name, String phoneNumber, int age) {
+		this.name = name;
+		this.phoneNumber = phoneNumber;
+		this.age = age;
+		this.bookings = new ArrayList<>();
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
+	public String getPhoneNumber() {
+		return phoneNumber;
+	}
 
-    public int getAge() {
-        return age;
-    }
+	public void setPhoneNumber(String phoneNumber) {
+		this.phoneNumber = phoneNumber;
+	}
 
-    public void setAge(int age) {
-        this.age = age;
-    }
+	public int getAge() {
+		return age;
+	}
 
-    public ArrayList<Booking> getBookings() {
-        return bookings;
-    }
+	public void setAge(int age) {
+		this.age = age;
+	}
 
-    public void setBookings(ArrayList<Booking> bookings) {
-        this.bookings = bookings;
-    }
+	public ArrayList<Booking> getBookings() {
+		return bookings;
+	}
 
-    
+	public void setBookings(ArrayList<Booking> bookings) {
+		this.bookings = bookings;
+	}
+
+	public boolean clientExists(String name, String phoneNumber) {
+		return getName().equals(name) && getPhoneNumber().equals(phoneNumber);
+	}
+
 }
