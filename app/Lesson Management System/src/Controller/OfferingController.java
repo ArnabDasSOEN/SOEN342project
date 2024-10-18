@@ -9,45 +9,52 @@ import Model.Offering;
 import Model.Schedule;
 
 public class OfferingController {
-	// temporary "database" containing all offerings
-	private ArrayList<Offering> offerings;
+	private ArrayList<Offering> offeringCollection;
+	private static OfferingController instance;
 
-	public boolean validate(Location L, Schedule S, int startTime, int endTime) {
-		return !find(L, S, startTime, endTime); // Return true if no conflicts are found
+	private OfferingController() {
+		offeringCollection = new ArrayList<>();
 	}
 
-	private boolean find(Location L, Schedule S, int startTime, int endTime) {
-		for (Offering offering : offerings) {
-			// If an offering matches the given location, schedule, and time range, return
-			// true
-			if (offering.equals(L, S, startTime, endTime)) {
+	public static OfferingController getInstance() {
+		if (instance == null) {
+			instance = new OfferingController();
+		}
+		return instance;
+	}
+
+	public boolean createOffering(Location location, Schedule schedule, int startTime, int endTime, boolean isGroup,
+			int capacity, LessonType lessonType) {
+		if (!validate(location, schedule, startTime, endTime)) {
+			return false; // Return false if an overlapping offering exists
+		}
+
+		Offering newOffering = new Offering(lessonType, isGroup, capacity, startTime, endTime, schedule, location);
+		schedule.addOffering(newOffering);
+		offeringCollection.add(newOffering);
+		return true;
+	}
+
+	public boolean validate(Location location, Schedule schedule, int startTime, int endTime) {
+		return !find(location, schedule, startTime, endTime); // Return true if no conflicts are found
+	}
+
+	private boolean find(Location location, Schedule schedule, int startTime, int endTime) {
+		for (Offering offering : offeringCollection) {
+			if (offering.equals(location, schedule, startTime, endTime)) {
 				return true;
 			}
 		}
-		// No matching offering was found, return false
-		return false;
+		return false; // No matching offering found
 	}
 
-	public void add(Offering offering) {
-		this.offerings.add(offering);
-	}
-
-	public boolean createOffering(Location L, Schedule S, int startTime, int endTime, boolean isGroup,
-			boolean availability, int capacity, LessonType lessonType) {
-// Return false if an overlapping offering exists
-		if (!validate(L, S, startTime, endTime)) {
-			return false;
-		}
-
-// Create and add the new Offering
-		Offering newOffering = new Offering(lessonType, isGroup, availability, capacity, startTime, endTime, S, L);
-		add(newOffering);
-		return true;
+	public ArrayList<Offering> getOfferingCollection() {
+		return offeringCollection;
 	}
 
 	public ArrayList<Offering> find(ArrayList<Location> availableLocations, LessonType specialization) {
 		ArrayList<Offering> matchingOfferings = new ArrayList<>();
-		for (Offering offering : offerings) {
+		for (Offering offering : offeringCollection) {
 			// Check if the offering's location is in the availableLocations list and
 			// matches the lesson type
 			if (availableLocations.contains(offering.getLocation())
@@ -69,7 +76,7 @@ public class OfferingController {
 		ArrayList<Offering> potOfferings = new ArrayList<Offering>();
 		// for each offer in the arrayList "offerings" (which serves as the temporary
 		// database for all offerings)
-		for (Offering offer : offerings) {
+		for (Offering offer : offeringCollection) {
 			// for each of the locations that the instructor can work in
 			for (String city : cities) {
 				if (offer.equalsforFindingOfferings(city, lessonType)) {

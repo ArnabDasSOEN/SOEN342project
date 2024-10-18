@@ -14,11 +14,11 @@ public class Offering {
 	private ArrayList<Booking> bookings;
 	private Location location;
 
-	public Offering(LessonType lessonType, boolean isGroup, boolean availability, int capacity, int startTime,
-			int endTime, Schedule schedule, Location location) {
+	public Offering(LessonType lessonType, boolean isGroup, int capacity, int startTime, int endTime, Schedule schedule,
+			Location location) {
 		this.lessonType = lessonType;
 		this.isGroup = isGroup;
-		this.availability = availability;
+		this.availability = false;
 		this.capacity = capacity;
 		this.startTime = startTime;
 		this.endTime = endTime;

@@ -9,12 +9,12 @@ public class Location {
 	private TypeOfSpace typeOfSpace;
 	private ArrayList<Schedule> schedules;
 
-	public Location(String name, String address, String city, TypeOfSpace typeOfSpace, ArrayList<Schedule> schedules) {
+	public Location(String name, String address, String city, TypeOfSpace typeOfSpace) {
 		this.name = name;
 		this.address = address;
 		this.city = city;
 		this.typeOfSpace = typeOfSpace;
-		this.schedules = new ArrayList<Schedule>();
+		this.schedules = new ArrayList<>();
 	}
 
 	public String getName() {
@@ -49,12 +49,25 @@ public class Location {
 		this.typeOfSpace = typeOfSpace;
 	}
 
-	public ArrayList<Schedule> getSchedules() {
-		return schedules;
-	}
-
 	public void setSchedules(ArrayList<Schedule> schedules) {
 		this.schedules = schedules;
 	}
 
+	public void addSchedule(Schedule schedule) {
+		this.schedules.add(schedule);
+	}
+
+	public ArrayList<Schedule> getSchedules() {
+		return schedules;
+	}
+
+	public boolean equals(String name, String address, String city) {
+		return getName().equals(name) && getAddress().equals(address) && getCity().equals(city);
+	}
+
+	@Override
+	public String toString() {
+		return "Location Name: " + name + ", Address: " + address + ", City: " + city + ", Type of Space: "
+				+ typeOfSpace;
+	}
 }

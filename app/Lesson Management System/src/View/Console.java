@@ -22,9 +22,20 @@ public class Console {
 	}
 
 	public void AdminLogin(String username, String password) {
+		AdminConsole AC = new AdminConsole();
+		if (AC.logIn(username, password)) {
+			AC.consoleMenu();
+		}
 	}
 
-	public void ClientRegister(String name, String phoneNumber) {
+	public void ClientRegister(String name, String phoneNumber, int age) {
+		ClientConsole CC = new ClientConsole();
+		if (CC.register(name, phoneNumber, age)) {
+			System.out.println("Successfully Registered");
+		} else {
+
+			System.out.println("Account exists already");
+		}
 	}
 
 	public void InstructorRegister(String name, String phoneNumber) {
@@ -67,11 +78,31 @@ public class Console {
 		String name = scanner.nextLine();
 		System.out.print("Enter your phone number (###-###-####): ");
 		String phoneNumber = scanner.nextLine();
-		if (validNumber(phoneNumber)) {
-			ClientRegister(name, phoneNumber);
-		} else {
+		if (!validNumber(phoneNumber)) {
 			System.out.println("Invalid phone number format. Please use ###-###-####.");
+			return; // Exit the method if phone number is invalid
 		}
+
+		System.out.print("Enter your age: ");
+		int age = 0;
+		boolean validAge = false;
+
+		// Loop until a valid age is entered
+		while (!validAge) {
+			try {
+				age = Integer.parseInt(scanner.nextLine());
+				if (age > 0) {
+					validAge = true; // Set to true if age is valid
+				} else {
+					System.out.println("Please enter a positive integer for age.");
+				}
+			} catch (NumberFormatException e) {
+				System.out.println("Invalid input. Please enter a valid age.");
+			}
+		}
+
+		// Call ClientRegister with name, phone number, and age
+		ClientRegister(name, phoneNumber, age);
 	}
 
 	private void handleInstructorRegister(Scanner scanner) {

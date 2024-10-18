@@ -15,17 +15,17 @@ public class ClientConsole {
 	}
 
 	private boolean isLoggedIn() {
-
 		return getLoggedInClient() == null;
 	}
 
 	public boolean logIn(String name, String phoneNumber) {
-
-		ClientController CController = new ClientController();
+		ClientController CController = ClientController.getInstance(); // Use singleton instance
 		setLoggedInClient(CController.login(name, phoneNumber));
-
 		return isLoggedIn();
-
 	}
 
+	public boolean register(String name, String phoneNumber, int age) {
+		ClientController CController = ClientController.getInstance(); // Use singleton instance
+		return CController.register(name, phoneNumber, age);
+	}
 }
