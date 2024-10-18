@@ -92,5 +92,7 @@ public class Offering {
     public boolean hasInstructor(){
         return this.instructor == null;
     }
-    public boolean equals(Location l, Schedule s, int startTime)
+    public boolean equals(Location l, Schedule s, int startTime){
+        return false;
+    }
 }

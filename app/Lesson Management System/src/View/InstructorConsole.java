@@ -7,10 +7,10 @@ public class InstructorConsole {
 
     private OfferingController OC;
 
-    public Offering[] viewPotentialOfferings(){
-    Instructor instructor = OC.get
+    // public Offering[] viewPotentialOfferings(){
+    // Instructor instructor = OC.get
 
-    }
+    // }
 
 
 
