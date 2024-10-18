@@ -93,6 +93,10 @@ public class Offering {
         return this.instructor == null;
     }
     public boolean equals(Location l, Schedule s, int startTime){
-        return false;
+        return this.location == l; //add logic
+    }
+    //for finding potential offerings, the instructor only cares about the location and the type of the lesson.
+    public boolean equalsforFindingOfferings(String city, LessonType lstype ){ //Location loc
+        return this.location.getCity() == city && this.lessonType == lstype ;
     }
 }

@@ -1,6 +1,6 @@
 package Model;
-
 import java.util.ArrayList;
+
 
 public class Instructor {
 private LessonType specialization;
@@ -75,4 +75,6 @@ public void setOfferings(ArrayList<Offering> offerings) {
 }
 
 
-}
+
+
+}//end of class
