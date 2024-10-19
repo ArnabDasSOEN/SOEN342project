@@ -16,4 +16,14 @@ public class InstructorConsole {
 		return OC.findPotentialOfferings(instructor.getCities(), instructor.getSpecialization());
 	}
 
+
+	public void takeOffering(Offering offering){
+		if(OC.available(offering)){ //if the offering is available (i.e. it has no instructor)
+			offering.setInstructor(IC.getInstructor()); //IC.getInstructor returns logged in instructor. Then we assign to respective offering.
+			IC.getInstructor().assignOffering(offering);// assign offering to the instructor logged in through the console
+		}
+		else{
+			//error message? success message? we implement or no?
+		}
+	}
 }

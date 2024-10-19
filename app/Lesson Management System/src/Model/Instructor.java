@@ -74,4 +74,8 @@ public class Instructor {
 		this.offerings = offerings;
 	}
 
+	public void assignOffering(Offering offering){
+		this.offerings.add(offering);
+	}
+
 }// end of class

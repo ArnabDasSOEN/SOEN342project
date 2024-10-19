@@ -72,7 +72,6 @@ public class OfferingController {
 //FUNCTIONALITIES REGARDING THE INSTRUCTOR AND FINDING THEIR POTENTIAL OFFERINGS
 	public ArrayList<Offering> findPotentialOfferings(ArrayList<String> cities, LessonType lessonType) { // Location[]
 																											// locations
-
 		ArrayList<Offering> potOfferings = new ArrayList<Offering>();
 		// for each offer in the arrayList "offerings" (which serves as the temporary
 		// database for all offerings)
