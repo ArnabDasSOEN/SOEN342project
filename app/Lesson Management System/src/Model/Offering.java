@@ -143,4 +143,8 @@ public class Offering {
 		this.getBookings() == of .getBookings() &&
 		this.getLocation().equals(of.getLocation());
 	}
+
+	public void spotFilled(){
+		this.setCapacity(this.getCapacity() - 1);
+	}
 }

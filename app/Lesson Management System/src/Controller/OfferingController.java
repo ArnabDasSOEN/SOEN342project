@@ -107,6 +107,6 @@ public class OfferingController {
 	}
 
 	public void decrementCapacity(Offering of){
-		of.setCapacity(of.getCapacity() - 1);
+		of.spotFilled();
 	}
 }// end of class
