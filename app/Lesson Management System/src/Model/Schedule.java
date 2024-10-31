@@ -79,7 +79,7 @@ public class Schedule {
 	}
 
 	// Helper method to convert day of week integer to string
-	private String getDayName(int dayOfWeek) {
+	public String getDayName(int dayOfWeek) {
 		switch (dayOfWeek) {
 		case 1:
 			return "Monday";

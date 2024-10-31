@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import Model.Booking;
 import Model.Offering;
 import Model.Client;
+import Model.Schedule;
 
 public class BookingController {
     private ArrayList<Booking> bookingCollection;
@@ -25,4 +26,12 @@ public class BookingController {
         return false;
     }
 
+    
+    public void createBooking(Offering of, Client c){
+        Schedule sch = of.getSchedule();
+        String date = "From :" + of.getStartTime() + " to " + of.getEndTime() + " on " + sch.getStartDate(); //do we add the end date as well? is it necessary?
+        //unsure of what the status is meant to signify lmao
+        Booking bk = new Booking(date,true, c, of);
+        this.getBookingCollection().add(bk);
+    }
 }

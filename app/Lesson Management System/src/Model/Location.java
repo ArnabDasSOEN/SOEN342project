@@ -65,6 +65,11 @@ public class Location {
 		return this.getName().equals(L.getName()) && this.getAddress().equals(L.getAddress()) && this.getCity().equals(L.getCity());
 	}
 
+	//i believe we're able to get away with just comparing the "references" since the compiler is smart enough to know that when we're comparing 2 strings, we're comparing their contents.
+	public boolean equals(String name, String address, String City) {
+		return this.getName().equals(name) && this.getAddress().equals(address) && this.getCity().equals(City);
+	}
+
 	@Override
 	public String toString() {
 		return "Location Name: " + name + ", Address: " + address + ", City: " + city + ", Type of Space: "

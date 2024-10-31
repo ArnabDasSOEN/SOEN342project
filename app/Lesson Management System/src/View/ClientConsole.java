@@ -53,7 +53,7 @@ public class ClientConsole {
 			}
 			else{//offering is not full
 				OC.decrementCapacity(of);
-				
+				BC.createBooking(of, this.getLoggedInClient() );
 			}//end of inner if statement
 		}
 
