@@ -129,4 +129,18 @@ public class Offering {
 	public boolean equalsforFindingOfferings(String city, LessonType lstype) { // Location loc
 		return getLocation().getCity() == city && getLessonType() == lstype;
 	}
+
+	public boolean equalsForComparingTwoOfferings(Offering of){
+		return this.getLessonType() == of.getLessonType() && 
+		this.isGroup() == of.isGroup() &&
+		this.isAvailability() == of.isAvailability() &&
+		this.getCapacity() == of.getCapacity() &&
+		this.getCapacity() == of.getCapacity() &&
+		this.getStartTime() == of.getStartTime() &&
+		this.getEndTime() == of.getEndTime() &&
+		this.getSchedule().equals(of.getSchedule()) &&
+		this.getInstructor().equals(of.getInstructor()) &&
+		this.getBookings() == of .getBookings() &&
+		this.getLocation().equals(of.getLocation());
+	}
 }

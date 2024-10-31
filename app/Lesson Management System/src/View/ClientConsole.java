@@ -1,10 +1,19 @@
 package View;
 
+import java.util.ArrayList;
+
+import Controller.OfferingController;
 import Controller.ClientController;
+import Model.Offering;
 import Model.Client;
+import Controller.BookingController;
+
+
 
 public class ClientConsole {
 	private Client loggedInClient;
+	private OfferingController OC;
+	private BookingController BC;
 
 	public Client getLoggedInClient() {
 		return loggedInClient;
@@ -28,4 +37,27 @@ public class ClientConsole {
 		ClientController CController = ClientController.getInstance(); // Use singleton instance
 		return CController.register(name, phoneNumber, age);
 	}
+
+	public ArrayList<Offering> viewOfferings(){
+		return OC.viewPublicOfferings();
+	}
+
+	//2nd functionality of  process booking
+	public void bookOffering(Offering of){
+		if(BC.checkBookingAvailability(of, this.getLoggedInClient())){
+			//do nothing since the booking is not available.
+		}
+		else{//booking is available
+			if(OC.isFull(of)){
+				//offering is full. Do nothing
+			}
+			else{//offering is not full
+				OC.decrementCapacity(of);
+				
+			}//end of inner if statement
+		}
+
+	}
+
+
 }

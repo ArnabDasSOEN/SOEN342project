@@ -61,8 +61,8 @@ public class Location {
 		return schedules;
 	}
 
-	public boolean equals(String name, String address, String city) {
-		return getName().equals(name) && getAddress().equals(address) && getCity().equals(city);
+	public boolean equals(Location L) {
+		return this.getName().equals(L.getName()) && this.getAddress().equals(L.getAddress()) && this.getCity().equals(L.getCity());
 	}
 
 	@Override

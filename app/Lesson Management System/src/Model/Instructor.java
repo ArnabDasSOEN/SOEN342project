@@ -78,4 +78,10 @@ public class Instructor {
 		this.offerings.add(offering);
 	}
 
+	public boolean equals(Instructor ins){
+		return this.getSpecialization() == ins.getSpecialization() && this.getName().equalsIgnoreCase(ins.getName()) && this.getPhoneNumber().equalsIgnoreCase(ins.getPhoneNumber()) &&
+		this.getStartDate().equalsIgnoreCase(ins.getStartDate()) && this.getEndDate().equalsIgnoreCase(ins.getEndDate()) && this.getCities() == ins.getCities()
+		&& this.getOfferings() == ins.getOfferings();
+	}
+
 }// end of class

@@ -86,4 +86,27 @@ public class OfferingController {
 		return potOfferings;
 	}
 
+	//logic for viewing offerings by the client
+	public ArrayList<Offering> viewPublicOfferings(){
+		//create the object that will be returned
+		ArrayList<Offering> publicOfferings = new ArrayList<Offering>();
+		//check if each offering has an instructor, if it does, add it to the collection
+		for(Offering of : offeringCollection){
+			if(of.hasInstructor()){
+				publicOfferings.add(of);
+			}
+		}
+		return publicOfferings; //return the collection.
+	}
+
+	//checks if the offering has space for bookings.
+	//if the capacity is bigger than the number of bookings, then that means it's not full.
+	public boolean isFull(Offering of){
+		//return !(of.getCapacity() > of.getBookings().size());
+		return !(of.getCapacity() > 0);
+	}
+
+	public void decrementCapacity(Offering of){
+		of.setCapacity(of.getCapacity() - 1);
+	}
 }// end of class

@@ -100,4 +100,10 @@ public class Schedule {
 		}
 	}
 
+	public boolean equals(Schedule sc){
+		return this.getStartDate().equalsIgnoreCase(sc.getStartDate()) && this.getEndDate().equalsIgnoreCase(sc.getEndDate()) && this.getDayOfWeek() == sc.getDayOfWeek()
+		&& this.getStartTime() == sc.getStartTime() && this.getEndTime() == sc.getEndTime() && this.getOfferings() == sc.getOfferings();
+	}
+
+
 }
