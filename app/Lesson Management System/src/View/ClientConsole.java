@@ -14,6 +14,7 @@ public class ClientConsole {
 	private Client loggedInClient;
 	private OfferingController OC;
 	private BookingController BC;
+	private ClientController CC;
 
 	public Client getLoggedInClient() {
 		return loggedInClient;
@@ -38,8 +39,48 @@ public class ClientConsole {
 		return CController.register(name, phoneNumber, age);
 	}
 
-	public ArrayList<Offering> viewOfferings(){
-		return OC.viewPublicOfferings();
+	//this method is good, the one after this one is not. I don't think there should be any logic done in the console.
+	//return type unsure
+	public void viewOfferings(){
+		//you keep a reference of this because you need it for the annotation
+		ArrayList<Offering> publicOfferings = OC.viewPublicOfferings();
+		int[] indexArr = CC.checkBookingAvailability(publicOfferings, this.getLoggedInClient());
+		String[] annotatedOfferings = this.annotateOfferingsList(publicOfferings, indexArr);
+		for(String s:annotatedOfferings ){
+			System.out.println(s);
+		}
+
+	}
+
+	//im against this, i think the console shouldn't have any logic. So maybe we just move this whole thing to the offering controller instead?
+	public String[] annotateOfferingsList(ArrayList<Offering> publicOfferingsList, int[] indexOfbookedOffers){
+		String[] annotatedOfferingList = new String[publicOfferingsList.size()];
+		//int offeringsIteration = 0; //used to iterate through each offering
+		int bookingsIteration = 0;
+		//for each offering in the publicOfferingList
+		for (int i = 0; i<publicOfferingsList.size(); i++){
+			Offering of = publicOfferingsList.get(i);
+			if (of.getCapacity() == 0 || indexOfbookedOffers[bookingsIteration] == i){
+				annotatedOfferingList[i] = of.toString() + " [unavailable]";
+				bookingsIteration++;
+			}
+			else{
+				annotatedOfferingList[i] = of.toString();
+			}
+		}
+		return annotatedOfferingList;
+		
+		//im keeping both becuase i don't know if you would prefer this one. Although i think the version above is much more readable.
+		// for (Offering of: publicOfferingsList){
+		// 	if(indexOfbookedOffers[bookingsIteration] == offeringsIteration || of.getCapacity() == 0){
+		// 		annotatedOfferingList[offeringsIteration] = of.toString() + " [unavailable]";
+		// 		bookingsIteration++;
+		// 	}
+		// 	else{
+		// 		annotatedOfferingList[offeringsIteration] = of.toString();
+		// 	}
+		// 	offeringsIteration++;
+		// }
 	}
 
 	//2nd functionality of  process booking
@@ -58,6 +99,4 @@ public class ClientConsole {
 		}
 
 	}
-
-
 }

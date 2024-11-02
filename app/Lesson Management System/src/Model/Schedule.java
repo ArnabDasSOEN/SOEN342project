@@ -105,5 +105,9 @@ public class Schedule {
 		&& this.getStartTime() == sc.getStartTime() && this.getEndTime() == sc.getEndTime() && this.getOfferings() == sc.getOfferings();
 	}
 
+	//idk if it's good to keep the end date for this. Maybe we just keep start date?
+	public String toStringForAnnotation(){
+		return this.getDayOfWeek() + "date: " + this.getStartDate() + " to " + this.getEndDate(); 
+	}
 
 }

@@ -60,4 +60,15 @@ public class Client {
 		//to the same bookings object.
 	}
 
+	public boolean checkBookings(Offering of){
+		//for each booking
+		for (Booking bk : bookings){
+			if(bk.getOffering() == of){
+				return true;
+			}
+		}
+		//if no matching booking was found, then return false.
+		return false;
+	}
+
 }

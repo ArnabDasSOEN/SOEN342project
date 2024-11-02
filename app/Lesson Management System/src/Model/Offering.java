@@ -108,8 +108,10 @@ public class Offering {
 		this.location = location;
 	}
 
+	//if the offering doesn't have an instructor, then this.instructor == null will evaluate to true. But the name "hasInstructor" means "does it have an instructor" therefor, 
+	//you should negate this value.
 	public boolean hasInstructor() {
-		return this.instructor == null;
+		return !(this.instructor == null);
 	}
 
 	public boolean equals(Location l, Schedule s, int startTime, int endTime) {
@@ -135,16 +137,21 @@ public class Offering {
 		this.isGroup() == of.isGroup() &&
 		this.isAvailability() == of.isAvailability() &&
 		this.getCapacity() == of.getCapacity() &&
-		this.getCapacity() == of.getCapacity() &&
 		this.getStartTime() == of.getStartTime() &&
 		this.getEndTime() == of.getEndTime() &&
-		this.getSchedule().equals(of.getSchedule()) &&
-		this.getInstructor().equals(of.getInstructor()) &&
-		this.getBookings() == of .getBookings() &&
-		this.getLocation().equals(of.getLocation());
+		this.getSchedule().equals(of.getSchedule()) && //check if these equals method are valid
+		this.getInstructor().equals(of.getInstructor()) && //check if these equals method are valid
+		this.getBookings() == of.getBookings() && //need to make an equals method for this (potentially)
+		this.getLocation().equals(of.getLocation()); //check if these equals method are valid
 	}
 
 	public void spotFilled(){
 		this.setCapacity(this.getCapacity() - 1);
 	}
+
+	public String toString(){
+		return "Lesson type: " + this.getLessonType() + " in group: " + this.isGroup() + " capacity left: " + this.getCapacity() + " from: " + this.getStartTime() +
+		" to " + this.getEndTime() + " on " + this.getSchedule().toStringForAnnotation() + " with: " + this.getInstructor().getName() + " in " + this.getLocation().toString();
+	}
+
 }
