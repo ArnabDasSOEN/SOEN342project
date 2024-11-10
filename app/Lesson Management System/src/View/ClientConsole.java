@@ -55,7 +55,6 @@ public class ClientConsole {
 	//im against this, i think the console shouldn't have any logic. So maybe we just move this whole thing to the offering controller instead?
 	public String[] annotateOfferingsList(ArrayList<Offering> publicOfferingsList, int[] indexOfbookedOffers){
 		String[] annotatedOfferingList = new String[publicOfferingsList.size()];
-		//int offeringsIteration = 0; //used to iterate through each offering
 		int bookingsIteration = 0;
 		//for each offering in the publicOfferingList
 		for (int i = 0; i<publicOfferingsList.size(); i++){
@@ -69,18 +68,6 @@ public class ClientConsole {
 			}
 		}
 		return annotatedOfferingList;
-		
-		//im keeping both becuase i don't know if you would prefer this one. Although i think the version above is much more readable.
-		// for (Offering of: publicOfferingsList){
-		// 	if(indexOfbookedOffers[bookingsIteration] == offeringsIteration || of.getCapacity() == 0){
-		// 		annotatedOfferingList[offeringsIteration] = of.toString() + " [unavailable]";
-		// 		bookingsIteration++;
-		// 	}
-		// 	else{
-		// 		annotatedOfferingList[offeringsIteration] = of.toString();
-		// 	}
-		// 	offeringsIteration++;
-		// }
 	}
 
 	//2nd functionality of  process booking

@@ -68,7 +68,7 @@ public class ClientController {
 			//the values of this array corresponds to the indices in the publicOfferings list in which the client already booked for (hence it needs to be annotated)
 			int[] indexArr = new int[bookingCount];
 			int counterForIndexArr = 0;
-			int offeringListIterationIndex = 0;
+			int offeringListIterationIndex = 0; //the current index of the offering being looked at in the publicOfferings list (param)
 
 			//for each offering, loop through each booking of the client
 			for (Offering of: publicOfferings){
@@ -77,7 +77,7 @@ public class ClientController {
 						counterForIndexArr++;
 					}
 					offeringListIterationIndex++;
-			}//end of loop
+			}
 			return indexArr;
 		}
 	}
