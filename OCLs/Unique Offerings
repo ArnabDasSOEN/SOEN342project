@@ -1,0 +1,4 @@
+1. “Offerings are unique. In other words, multiple offerings on the same day and time slot must be offered at a different location.”
+
+Context: Offering
+	Inv: Offering.allInstances() → forAll(o1, o2 | o1.schedule.dayOfWeek = o2.schedule.dayOfWeek and o1.startTime = o2.startTime and o1.endTime = o2.endTime implies o1.location <> o2.location)
