@@ -1,0 +1,5 @@
+2. “Any client who is underage must necessarily be accompanied by an adult who acts as their guardian.” 
+
+Context: Client
+	Inv: self.age < 18 implies (self.guardian <> null and self.guardian.age >= 18)
+
