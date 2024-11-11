@@ -1,0 +1,4 @@
+3. “The city associated with an offering must be one of the city’s that the instructor has indicated in their availabilities.” 
+
+Context: Offering
+	Inv: self.Instructor <> null implies self.Instructor.availabilities → exists(a | a.city = self.location.city)
