@@ -1,0 +1,9 @@
+
+4. “A client does not have multiple bookings on the same day and time slot.” (for simplicity we consider only identical day and time slots, even though in reality a booking on Monday 3pm – 4pm and another also on Monday 3:30pm – 4:30pm should not be acceptable.)
+
+Context: Client
+	Inv: self.bookings → forAll(b1, b2 | 
+    b1<> b2 implies 
+    b1.offering.schedule.dayOfWeek <> b2.offering.schedule.dayOfWeek
+    or b1.offering.schedule.startTime <> b2.offering.schedule.startTime 
+    or b1.offering.schedule.endTime <> b2.offering.schedule.endTime)
