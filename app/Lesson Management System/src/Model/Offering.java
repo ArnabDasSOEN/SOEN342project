@@ -3,6 +3,7 @@ package Model;
 import java.util.ArrayList;
 
 public class Offering {
+	private int id; // Unique identifier
 	private LessonType lessonType;
 	private boolean isGroup;
 	private boolean availability;
@@ -14,8 +15,8 @@ public class Offering {
 	private ArrayList<Booking> bookings;
 	private Location location;
 
-	public Offering(LessonType lessonType, boolean isGroup, int capacity, int startTime, int endTime, Schedule schedule,
-			Location location) {
+	public Offering(LessonType lessonType, boolean isGroup, int capacity, int startTime, int endTime, Schedule schedule, Location location) {
+		this.id = 0;
 		this.lessonType = lessonType;
 		this.isGroup = isGroup;
 		this.availability = false;
@@ -24,8 +25,16 @@ public class Offering {
 		this.endTime = endTime;
 		this.schedule = schedule;
 		this.instructor = null;
-		this.bookings = new ArrayList<Booking>();
+		this.bookings = new ArrayList<>();
 		this.location = location;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	public LessonType getLessonType() {
@@ -152,6 +161,11 @@ public class Offering {
 	public String toString(){
 		return "Lesson type: " + this.getLessonType() + " in group: " + this.isGroup() + " capacity left: " + this.getCapacity() + " from: " + this.getStartTime() +
 		" to " + this.getEndTime() + " on " + this.getSchedule().toStringForAnnotation() + " with: " + this.getInstructor().getName() + " in " + this.getLocation().toString();
+	}
+
+	public void incrementCapacity() {
+		// TODO Auto-generated method stub
+		this.setCapacity(this.getCapacity() + 1);
 	}
 
 }

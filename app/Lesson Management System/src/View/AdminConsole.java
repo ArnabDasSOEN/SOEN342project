@@ -1,374 +1,333 @@
 package View;
 
+import Controller.ClientController;
+import Controller.InstructorController;
 import Controller.LocationController;
 import Controller.OfferingController;
 import Controller.ScheduleController;
+import Model.Client;
+import Model.Instructor;
+import Model.Location;
 import Model.Schedule;
 import Model.TypeOfSpace;
 import Model.LessonType;
-import Model.Location;
 import Model.Offering;
 
+import javax.swing.*;
+import java.awt.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.InputMismatchException;
-import java.util.Scanner;
+import java.util.List;
 
-public class AdminConsole {
-	private String username = "1";
-	private String password = "1";
-	private LocationController locationController = LocationController.getInstance();
-	private ScheduleController scheduleController = ScheduleController.getInstance();
-	private OfferingController offeringController = OfferingController.getInstance();
+public class AdminConsole extends JFrame implements Runnable {
+    private String username = "admin";
+    private String password = "admin";
+    private LocationController locationController = LocationController.getInstance();
+    private ScheduleController scheduleController = ScheduleController.getInstance();
+    private OfferingController offeringController = OfferingController.getInstance();
+    private ClientController clientController = ClientController.getInstance();
+    private InstructorController instructorController = InstructorController.getInstance();
 
-	public String getUsername() {
-		return username;
-	}
+    private JTextArea outputArea;
+    private JButton addButton, viewButton, manageLocationButton, manageAccountsButton, viewOfferingsButton, logoutButton;
+    
+    public AdminConsole() {
+        setTitle("Admin Console");
+        setSize(700, 500);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLayout(new BorderLayout());
 
-	public void setUsername(String username) {
-		this.username = username;
-	}
+        // Output Area
+        outputArea = new JTextArea();
+        outputArea.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(outputArea);
+        add(scrollPane, BorderLayout.CENTER);
 
-	public String getPassword() {
-		return password;
-	}
+        // Button Panel for admin actions
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new GridLayout(1, 6));
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
+        addButton = new JButton("Add Location");
+        viewButton = new JButton("View Locations");
+        manageLocationButton = new JButton("Manage Location");
+        manageAccountsButton = new JButton("Manage Accounts");
+        viewOfferingsButton = new JButton("View Offerings"); // New button to view all offerings
+        logoutButton = new JButton("Logout");
 
-	public void consoleMenu() {
-		Scanner scanner = new Scanner(System.in);
-		boolean running = true;
+        buttonPanel.add(addButton);
+        buttonPanel.add(viewButton);
+        buttonPanel.add(manageLocationButton);
+        buttonPanel.add(manageAccountsButton);
+        buttonPanel.add(viewOfferingsButton); // Add the new button
+        buttonPanel.add(logoutButton);
+        add(buttonPanel, BorderLayout.SOUTH);
 
-		while (running) {
-			displayMenuOptions();
-			int choice = getMenuChoice(scanner);
+        // Button Action Listeners
+        addButton.addActionListener(e -> handleAddLocation());
+        viewButton.addActionListener(e -> viewLocations());
+        manageLocationButton.addActionListener(e -> handleManageLocation());
+        manageAccountsButton.addActionListener(e -> handleManageAccounts());
+        viewOfferingsButton.addActionListener(e -> viewOfferings()); // Add action for viewing offerings
+        logoutButton.addActionListener(e -> dispose());
+    }
+    @Override
+    public void run() {
+        setVisible(true);
+        displayMessage("==== Admin Console Menu ====");
+    }
 
-			switch (choice) {
-			case 1:
-				handleAddLocation(scanner);
-				break;
-			case 2:
-				viewLocations(scanner);
-				break;
-			case 3:
-				System.out.println("Logging out...");
-				running = false; // Exit the loop and log out
-				break;
-			default:
-				System.out.println("Invalid option, please try again.");
-				break;
-			}
-		}
+    private void displayMessage(String message) {
+        outputArea.append(message + "\n");
+    }
 
-		scanner.close();
-	}
+    // Handle adding a new location
+    private void handleAddLocation() {
+        String name = JOptionPane.showInputDialog(this, "Enter location name:");
+        String address = JOptionPane.showInputDialog(this, "Enter location address:");
+        String city = JOptionPane.showInputDialog(this, "Enter location city:");
+        String type = JOptionPane.showInputDialog(this, "Enter type of space (e.g., CLASSROOM, AUDITORIUM):");
 
-	private void displayMenuOptions() {
-		System.out.println("\n==== Admin Console Menu ====");
-		System.out.println("1. Add Location");
-		System.out.println("2. View Locations");
-		System.out.println("3. Logout");
-		System.out.print("Select an option: ");
-	}
+        TypeOfSpace typeOfSpace = isValidTypeOfSpace(type) ? TypeOfSpace.valueOf(type.toUpperCase()) : null;
+        if (typeOfSpace != null) {
+            Location result = locationController.createLocation(name, address, city, typeOfSpace);
+            displayMessage(result != null ? "Location added successfully." : "Location already exists or failed to add.");
+        } else {
+            displayMessage("Invalid Type of Space. Please enter a valid type.");
+        }
+    }
+    private void viewOfferings() {
+        List<Offering> offerings = offeringController.getOfferingCollection();
+        if (offerings.isEmpty()) {
+            displayMessage("No offerings available.");
+        } else {
+            StringBuilder offeringList = new StringBuilder("==== List of Offerings ====\n");
+            for (Offering offering : offerings) {
+                offeringList.append(offering).append("\n");
+            }
+            displayMessage(offeringList.toString());
+        }
+    }
+    // Handle viewing all locations
+    private void viewLocations() {
+        List<Location> locations = locationController.getLocationCollection();
+        if (locations.isEmpty()) {
+            displayMessage("No locations available.");
+        } else {
+            StringBuilder locationList = new StringBuilder("==== List of Locations ====\n");
+            for (Location loc : locations) {
+                locationList.append(loc).append("\n");
+            }
+            displayMessage(locationList.toString());
+        }
+    }
 
-	private int getMenuChoice(Scanner scanner) {
-		int choice = 0;
-		while (true) {
-			try {
-				choice = scanner.nextInt();
-				scanner.nextLine(); // Consume the newline character
-				break; // Exit loop if input is valid
-			} catch (InputMismatchException e) {
-				System.out.println("Invalid input. Please enter a number corresponding to the menu option.");
-				scanner.nextLine(); // Clear the invalid input
-			}
-		}
-		return choice;
-	}
+    // Handle managing a specific location
+    private void handleManageLocation() {
+        String locationName = JOptionPane.showInputDialog(this, "Enter location name to manage:");
+        Location location = locationController.getLocationByName(locationName);
 
-	private void handleAddLocation(Scanner scanner) {
-		String name = promptUserForInput(scanner, "Enter location name: ");
-		String address = promptUserForInput(scanner, "Enter location address: ");
-		String city = promptUserForInput(scanner, "Enter location city: ");
-		TypeOfSpace typeOfSpace = promptUserForSpaceType(scanner);
+        if (location != null) {
+            String[] options = {"View Schedules", "Add Schedule", "Create Offering", "Back"};
+            int choice = JOptionPane.showOptionDialog(
+                    this,
+                    "Manage options for " + location.getName(),
+                    "Manage Location",
+                    JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.PLAIN_MESSAGE,
+                    null,
+                    options,
+                    options[0]
+            );
 
-		if (typeOfSpace != null) {
-			Location result = locationController.createLocation(name, address, city, typeOfSpace);
+            switch (choice) {
+                case 0 -> viewSchedules(location);
+                case 1 -> handleAddSchedule(location);
+                case 2 -> handleCreateOffering(location);
+                default -> displayMessage("Back to main menu.");
+            }
+        } else {
+            displayMessage("Location not found.");
+        }
+    }
 
-			if (result != null) {
-				System.out.println("Location added successfully.");
-				System.out.println("Now add Schedule");
-				handleCreateSchedule(scanner, result);
-			} else {
-				System.out.println("Location already exists or failed to add.");
-			}
-		}
-	}
+    // View schedules for a specific location
+    private void viewSchedules(Location location) {
+        List<Schedule> schedules = location.getSchedules();
+        if (schedules.isEmpty()) {
+            displayMessage("No schedules available for this location.");
+        } else {
+            StringBuilder scheduleList = new StringBuilder("==== Schedules for " + location.getName() + " ====\n");
+            for (Schedule schedule : schedules) {
+                scheduleList.append(schedule).append("\n");
+            }
+            displayMessage(scheduleList.toString());
+        }
+    }
 
-	private String promptUserForInput(Scanner scanner, String prompt) {
-		System.out.print(prompt);
-		return scanner.nextLine();
-	}
+    // Add schedule to a specific location
+    private void handleAddSchedule(Location location) {
+        String startDate = JOptionPane.showInputDialog(this, "Enter schedule start date (yyyy-mm-dd):");
+        String endDate = JOptionPane.showInputDialog(this, "Enter schedule end date (yyyy-mm-dd):");
+        int dayOfWeek = Integer.parseInt(JOptionPane.showInputDialog(this, "Enter day of the week (1 for Monday, 7 for Sunday):"));
+        int startTime = Integer.parseInt(JOptionPane.showInputDialog(this, "Enter start time (0-24):"));
+        int endTime = Integer.parseInt(JOptionPane.showInputDialog(this, "Enter end time (0-24):"));
 
-	private TypeOfSpace promptUserForSpaceType(Scanner scanner) {
-		System.out.print("Enter type of space (e.g., CLASSROOM, AUDITORIUM): ");
-		String type = scanner.nextLine();
-		if (isValidTypeOfSpace(type)) {
-			return TypeOfSpace.valueOf(type.toUpperCase());
-		} else {
-			System.out.println("Invalid Type of Space. Please enter one of the following:");
-			for (TypeOfSpace types : TypeOfSpace.values()) {
-				System.out.println(types);
-			}
-			return null;
-		}
-	}
+        if (isValidScheduleInput(startDate, endDate, dayOfWeek, startTime, endTime)) {
+            Schedule newSchedule = scheduleController.createSchedule(startDate, endDate, dayOfWeek, startTime, endTime, location);
+            if (newSchedule != null) {
+                locationController.addScheduleToLocation(location, newSchedule);
+                displayMessage("Schedule created successfully.");
+            } else {
+                displayMessage("Failed to create schedule.");
+            }
+        } else {
+            displayMessage("Invalid schedule input.");
+        }
+    }
 
-	private void handleCreateSchedule(Scanner scanner, Location location) {
-		String startDate = promptUserForInput(scanner, "Enter schedule start date (yyyy-mm-dd): ");
-		String endDate = promptUserForInput(scanner, "Enter schedule end date (yyyy-mm-dd): ");
-		int dayOfWeek = promptUserForInteger(scanner, "Enter day of the week (1 for Monday, 7 for Sunday): ");
-		int startTime = promptUserForInteger(scanner, "Enter start time (0-24): ");
-		int endTime = promptUserForInteger(scanner, "Enter end time (0-24): ");
+    // Create an offering for a specific location
+    private void handleCreateOffering(Location location) {
+        List<Schedule> schedules = location.getSchedules();
 
-		if (isValidScheduleInput(startDate, endDate, dayOfWeek, startTime, endTime)) {
-			Schedule newSchedule = scheduleController.createSchedule(startDate, endDate, dayOfWeek, startTime, endTime,
-					location);
-			System.out.println(newSchedule != null ? "Schedule created successfully." : "Failed to create schedule.");
-		}
-	}
+        if (schedules.isEmpty()) {
+            displayMessage("Cannot create an offering. No schedules are available for this location.");
+            return;
+        }
 
-	private int promptUserForInteger(Scanner scanner, String prompt) {
-		int number = -1;
-		while (true) {
-			try {
-				System.out.print(prompt);
-				number = scanner.nextInt();
-				scanner.nextLine(); // Consume the newline character
-				break; // Exit loop if input is valid
-			} catch (InputMismatchException e) {
-				System.out.println("Invalid input. Please enter a valid number.");
-				scanner.nextLine(); // Clear the invalid input
-			}
-		}
-		return number;
-	}
+        Schedule selectedSchedule = chooseSchedule(schedules);
+        if (selectedSchedule == null) {
+            displayMessage("No schedule selected. Offering creation cancelled.");
+            return;
+        }
 
-	private boolean isValidScheduleInput(String startDate, String endDate, int dayOfWeek, int startTime, int endTime) {
-		if (!isValidDateFormat(startDate) || !isValidDateFormat(endDate)) {
-			System.out.println("Invalid date format. Please use yyyy-mm-dd.");
-			return false;
-		}
-		if (!areDatesValid(startDate, endDate)) {
-			System.out.println("Start date must be before end date.");
-			return false;
-		}
-		if (!isValidTime(startTime) || !isValidTime(endTime)) {
-			System.out.println("Start time and end time must be between 0 and 24 hours.");
-			return false;
-		}
-		if (!isValidDayOfWeek(dayOfWeek)) {
-			System.out.println("Day of the week must be between 1 (Monday) and 7 (Sunday).");
-			return false;
-		}
-		return true;
-	}
+        int startTime = Integer.parseInt(JOptionPane.showInputDialog(this, "Enter offering start time (0-24):"));
+        int endTime = Integer.parseInt(JOptionPane.showInputDialog(this, "Enter offering end time (0-24):"));
+        boolean isGroup = JOptionPane.showConfirmDialog(this, "Is this a group offering?", "Group Offering", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
+        int capacity = Integer.parseInt(JOptionPane.showInputDialog(this, "Enter capacity for this offering:"));
+        String lessonTypeStr = JOptionPane.showInputDialog(this, "Enter lesson type (e.g., MATH, SCIENCE):");
 
-	public boolean logIn(String username, String password) {
-		return getUsername().equals(username) && getPassword().equals(password);
-	}
+        LessonType lessonType = LessonType.valueOf(lessonTypeStr.toUpperCase());
 
-	private boolean isValidTypeOfSpace(String typeOfSpaceStr) {
-		try {
-			TypeOfSpace.valueOf(typeOfSpaceStr.toUpperCase());
-			return true;
-		} catch (IllegalArgumentException e) {
-			return false; // Handle invalid TypeOfSpace
-		}
-	}
+        boolean success = offeringController.createOffering(location, selectedSchedule, startTime, endTime, isGroup, capacity, lessonType);
+        displayMessage(success ? "Offering created successfully." : "Failed to create offering.");
+    }
 
-	public void viewLocations(Scanner scanner) {
-		ArrayList<Location> locations = locationController.getLocationCollection();
+    private Schedule chooseSchedule(List<Schedule> schedules) {
+        String[] scheduleOptions = schedules.stream().map(Schedule::toString).toArray(String[]::new);
 
-		if (locations.isEmpty()) {
-			System.out.println("No locations available.");
-			return;
-		}
+        String selectedOption = (String) JOptionPane.showInputDialog(
+                this,
+                "Select a schedule for the offering:",
+                "Choose Schedule",
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                scheduleOptions,
+                scheduleOptions[0]
+        );
 
-		displayLocationList(locations);
-		int choice = getLocationChoice(scanner, locations.size());
+        return schedules.stream().filter(s -> s.toString().equals(selectedOption)).findFirst().orElse(null);
+    }
 
-		if (choice > 0 && choice <= locations.size()) {
-			handleLocationOptions(scanner, locations.get(choice - 1));
-		} else {
-			System.out.println("Invalid option. Please try again.");
-		}
-	}
+    // Manage accounts (view/delete)
+    private void handleManageAccounts() {
+        String[] options = {"View Clients", "View Instructors", "Delete Client", "Delete Instructor", "Back"};
+        int choice = JOptionPane.showOptionDialog(
+                this,
+                "Account Management Options",
+                "Manage Accounts",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                options,
+                options[0]
+        );
 
-	private void displayLocationList(ArrayList<Location> locations) {
-		System.out.println("\n==== List of Locations ====");
-		for (int i = 0; i < locations.size(); i++) {
-			System.out.println((i + 1) + ". " + locations.get(i));
-		}
-		System.out.println("\nSelect a location by number to view its options, or 0 to go back:");
-	}
+        switch (choice) {
+            case 0 -> viewClients();
+            case 1 -> viewInstructors();
+            case 2 -> deleteClient();
+            case 3 -> deleteInstructor();
+            default -> displayMessage("Back to main menu.");
+        }
+    }
 
-	private int getLocationChoice(Scanner scanner, int maxChoice) {
-		return promptUserForInteger(scanner, "Select a location (1-" + maxChoice + ", 0 to go back): ");
-	}
+    private void viewClients() {
+        List<Client> clients = clientController.getAllClients();
+        if (clients.isEmpty()) {
+            displayMessage("No clients found.");
+        } else {
+            StringBuilder clientList = new StringBuilder("==== List of Clients ====\n");
+            for (Client client : clients) {
+                clientList.append(client).append("\n");
+            }
+            displayMessage(clientList.toString());
+        }
+    }
 
-	private void handleLocationOptions(Scanner scanner, Location location) {
-		System.out.println("\nSelected Location: " + location);
-		System.out.println("1. Add a new schedule to this location");
-		System.out.println("2. View all schedules for this location");
-		System.out.println("3. Go back to the location list");
-		System.out.print("Select an option: ");
+    private void viewInstructors() {
+        List<Instructor> instructors = instructorController.getAllInstructors();
+        if (instructors.isEmpty()) {
+            displayMessage("No instructors found.");
+        } else {
+            StringBuilder instructorList = new StringBuilder("==== List of Instructors ====\n");
+            for (Instructor instructor : instructors) {
+                instructorList.append(instructor).append("\n");
+            }
+            displayMessage(instructorList.toString());
+        }
+    }
 
-		int choice = promptUserForInteger(scanner, "Select an option: ");
+    private void deleteClient() {
+        String clientName = JOptionPane.showInputDialog(this, "Enter client name to delete:");
+        String clientPhone = JOptionPane.showInputDialog(this, "Enter client phone to delete:");
 
-		switch (choice) {
-		case 1:
-			handleCreateSchedule(scanner, location);
-			break;
-		case 2:
-			viewSchedules(scanner, location);
-			break;
-		case 3:
-			return; // Go back to the location list
-		default:
-			System.out.println("Invalid option. Please try again.");
-			break;
-		}
-	}
+        Client client = clientController.getClientByNameAndPhone(clientName, clientPhone);
+        if (client != null) {
+            clientController.deleteClient(client);
+            displayMessage("Client deleted successfully.");
+        } else {
+            displayMessage("Client not found.");
+        }
+    }
 
-	private void viewSchedules(Scanner scanner, Location location) {
-		ArrayList<Schedule> schedules = scheduleController.getSchedulesForLocation(location);
-		if (schedules.isEmpty()) {
-			System.out.println("No schedules available for this location.");
-		} else {
-			System.out.println("Schedules for " + location.getName() + ":");
-			for (int i = 0; i < schedules.size(); i++) {
-				System.out.println((i + 1) + ". " + schedules.get(i));
-			}
+    private void deleteInstructor() {
+        String instructorName = JOptionPane.showInputDialog(this, "Enter instructor name to delete:");
+        String instructorPhone = JOptionPane.showInputDialog(this, "Enter instructor phone to delete:");
 
-			int choice = promptUserForInteger(scanner,
-					"Select a schedule to view offerings (1-" + schedules.size() + ", 0 to go back): ");
-			if (choice > 0 && choice <= schedules.size()) {
-				handleScheduleOptions(scanner, schedules.get(choice - 1), location);
-			} else {
-				System.out.println("Going back to location options.");
-			}
-		}
-	}
+        Instructor instructor = instructorController.getInstructorByNameAndPhone(instructorName, instructorPhone);
+        if (instructor != null) {
+            instructorController.deleteInstructor(instructor);
+            displayMessage("Instructor deleted successfully.");
+        } else {
+            displayMessage("Instructor not found.");
+        }
+    }
 
-	private void handleScheduleOptions(Scanner scanner, Schedule schedule, Location location) {
-		System.out.println("\nSelected Schedule: " + schedule);
-		System.out.println("1. View Offerings");
-		System.out.println("2. Create Offering");
-		System.out.println("3. Go back to the schedule list");
-		System.out.print("Select an option: ");
+    // Input validation helper methods
+    private boolean isValidScheduleInput(String startDate, String endDate, int dayOfWeek, int startTime, int endTime) {
+        return isValidDateFormat(startDate) && isValidDateFormat(endDate) && startDate.compareTo(endDate) < 0 &&
+               dayOfWeek >= 1 && dayOfWeek <= 7 && startTime >= 0 && startTime <= 24 && endTime >= 0 && endTime <= 24;
+    }
 
-		int choice = promptUserForInteger(scanner, "Select an option: ");
+    private boolean isValidDateFormat(String date) {
+        try {
+            new SimpleDateFormat("yyyy-MM-dd").parse(date);
+            return true;
+        } catch (ParseException e) {
+            return false;
+        }
+    }
 
-		switch (choice) {
-		case 1:
-			viewOfferings(scanner, schedule);
-			break;
-		case 2:
-			createOffering(scanner, schedule, location);
-			break;
-		case 3:
-			return; // Go back to the location list
-		default:
-			System.out.println("Invalid option. Please try again.");
-			break;
-		}
-	}
+    private boolean isValidTypeOfSpace(String typeOfSpaceStr) {
+        try {
+            TypeOfSpace.valueOf(typeOfSpaceStr.toUpperCase());
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
 
-	private void viewOfferings(Scanner scanner, Schedule schedule) {
-		ArrayList<Offering> offerings = schedule.getOfferings();
-		if (offerings.isEmpty()) {
-			System.out.println("No offerings available for this schedule.");
-		} else {
-			System.out.println("Offerings for " + schedule + ":");
-			for (Offering offering : offerings) {
-				System.out.println(offering);
-			}
-		}
-	}
-
-	// Updated createOffering method in AdminConsole class
-	private void createOffering(Scanner scanner, Schedule schedule, Location location) {
-		int startTime = promptUserForInteger(scanner, "Enter start time (0-24): ");
-		int endTime = promptUserForInteger(scanner, "Enter end time (0-24): ");
-
-		boolean isGroup = promptUserForBoolean(scanner, "Is this a group offering? (true/false): ");
-		int capacity = promptUserForInteger(scanner, "Enter capacity for this offering: ");
-		LessonType lessonType = promptUserForLessonType(scanner); // You need to implement this method
-
-		OfferingController offeringController = OfferingController.getInstance(); // Ensure you get the instance
-
-		// Create the offering using the controller
-		boolean success = offeringController.createOffering(location, schedule, startTime, endTime, isGroup, capacity,
-				lessonType);
-
-		if (success) {
-			System.out.println("Offering created successfully.");
-		} else {
-			System.out.println("Failed to create offering due to conflicts or invalid data.");
-		}
-	}
-
-	// New helper method to get boolean input
-	private boolean promptUserForBoolean(Scanner scanner, String prompt) {
-		while (true) {
-			System.out.print(prompt);
-			String input = scanner.nextLine().trim();
-			if (input.equalsIgnoreCase("true")) {
-				return true;
-			} else if (input.equalsIgnoreCase("false")) {
-				return false;
-			} else {
-				System.out.println("Invalid input. Please enter 'true' or 'false'.");
-			}
-		}
-	}
-
-	// New helper method to get LessonType
-	private LessonType promptUserForLessonType(Scanner scanner) {
-		System.out.print("Enter lesson type (e.g., MATH, SCIENCE): ");
-		String type = scanner.nextLine();
-		try {
-			return LessonType.valueOf(type.toUpperCase());
-		} catch (IllegalArgumentException e) {
-			System.out.println("Invalid Lesson Type. Please enter a valid type.");
-			return promptUserForLessonType(scanner); // Retry until valid
-		}
-	}
-
-	private boolean isValidDateFormat(String date) {
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-		dateFormat.setLenient(false);
-		try {
-			dateFormat.parse(date);
-			return true;
-		} catch (ParseException e) {
-			return false; // Invalid date format
-		}
-	}
-
-	private boolean areDatesValid(String startDate, String endDate) {
-		return startDate.compareTo(endDate) < 0; // Returns true if startDate is before endDate
-	}
-
-	private boolean isValidTime(int time) {
-		return time >= 0 && time <= 24; // Valid if time is between 0 and 24
-	}
-
-	private boolean isValidDayOfWeek(int dayOfWeek) {
-		return dayOfWeek >= 1 && dayOfWeek <= 7; // Valid if dayOfWeek is between 1 and 7
-	}
+    public boolean logIn(String username, String password) {
+        return this.username.equals(username) && this.password.equals(password);
+    }
 }

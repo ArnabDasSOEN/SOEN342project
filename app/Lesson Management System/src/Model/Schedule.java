@@ -3,20 +3,30 @@ package Model;
 import java.util.ArrayList;
 
 public class Schedule {
+	private int id; // Unique identifier
 	private String startDate;
 	private String endDate;
 	private int dayOfWeek;
-	private int startTime; // Changed to int
-	private int endTime; // Changed to int
+	private int startTime;
+	private int endTime;
 	private ArrayList<Offering> offerings;
 
 	public Schedule(String startDate, String endDate, int dayOfWeek, int startTime, int endTime) {
+		this.id = 0;
 		this.startDate = startDate;
 		this.endDate = endDate;
 		this.dayOfWeek = dayOfWeek;
 		this.startTime = startTime;
 		this.endTime = endTime;
-		this.offerings = new ArrayList<Offering>();
+		this.offerings = new ArrayList<>();
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	public String getStartDate() {

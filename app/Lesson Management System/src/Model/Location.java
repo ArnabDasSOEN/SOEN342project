@@ -3,6 +3,7 @@ package Model;
 import java.util.ArrayList;
 
 public class Location {
+	private int id; // Unique identifier
 	private String name;
 	private String address;
 	private String city;
@@ -10,11 +11,20 @@ public class Location {
 	private ArrayList<Schedule> schedules;
 
 	public Location(String name, String address, String city, TypeOfSpace typeOfSpace) {
+		this.id = 0;
 		this.name = name;
 		this.address = address;
 		this.city = city;
 		this.typeOfSpace = typeOfSpace;
 		this.schedules = new ArrayList<>();
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	public String getName() {

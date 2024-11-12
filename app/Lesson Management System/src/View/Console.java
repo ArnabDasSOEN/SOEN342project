@@ -1,5 +1,6 @@
 package View;
 
+import javax.swing.*;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 import java.util.regex.Matcher;
@@ -7,173 +8,173 @@ import java.util.regex.Pattern;
 
 public class Console {
 
-	public void ClientLogin(String name, String phoneNumber) {
-		ClientConsole CC = new ClientConsole();
+    // Client login
+    public void clientLogin(String name, String phoneNumber) {
+        ClientConsole clientConsole = new ClientConsole();
+        if (clientConsole.logIn(name, phoneNumber)) {
+            System.out.println("Login successful. Starting client session...");
+            SwingUtilities.invokeLater(clientConsole); // Run client console GUI in a new thread
+        } else {
+            System.out.println("Account does not exist or incorrect name/phone number.");
+        }
+    }
 
-		if (CC.logIn(name, phoneNumber)) {
-			System.out.println("Account does not exist or Incorrect name/phoneNumber");
-		} else {
-			System.out.println("Login Successful");
-		}
+    // Instructor login
+    public void instructorLogin(String name, String phoneNumber) {
+        InstructorConsole instructorConsole = new InstructorConsole();
+        boolean loginSuccessful = true; // Placeholder for actual login logic
+        if (loginSuccessful) {
+            System.out.println("Instructor login successful. Starting instructor session...");
+            SwingUtilities.invokeLater(instructorConsole);
+        } else {
+            System.out.println("Account does not exist or incorrect name/phone number.");
+        }
+    }
 
-	}
+    // Admin login
+    public void adminLogin(String username, String password) {
+        AdminConsole adminConsole = new AdminConsole();
+        if (adminConsole.logIn(username, password)) {
+            System.out.println("Admin login successful. Starting admin session...");
+            SwingUtilities.invokeLater(adminConsole);
+        } else {
+            System.out.println("Incorrect username or password.");
+        }
+    }
 
-	public void InstructorLogin(String name, String phoneNumber) {
-	}
+    // Register client
+    public void clientRegister(String name, String phoneNumber, int age) {
+        ClientConsole clientConsole = new ClientConsole();
+        if (clientConsole.registerNormal(name, phoneNumber, age)) {
+            System.out.println("Successfully registered new client.");
+        } else {
+            System.out.println("Account already exists.");
+        }
+    }
 
-	public void AdminLogin(String username, String password) {
-		AdminConsole AC = new AdminConsole();
-		if (AC.logIn(username, password)) {
-			AC.consoleMenu();
-		}
-	}
+    // Placeholder for instructor registration
+    public void instructorRegister(String name, String phoneNumber) {
+        System.out.println("Instructor registration feature coming soon.");
+    }
 
-	public void ClientRegister(String name, String phoneNumber, int age) {
-		ClientConsole CC = new ClientConsole();
-		if (CC.register(name, phoneNumber, age)) {
-			System.out.println("Successfully Registered");
-		} else {
+    // Console menu
+    public void consoleMenu() {
+        Scanner scanner = new Scanner(System.in);
+        boolean running = true;
 
-			System.out.println("Account exists already");
-		}
-	}
+        while (running) {
+            System.out.println("\n==== Console Menu ====");
+            System.out.println("1. Client Login");
+            System.out.println("2. Instructor Login");
+            System.out.println("3. Admin Login");
+            System.out.println("4. Client Register");
+            System.out.println("5. Instructor Register");
+            System.out.println("6. Close Console");
+            System.out.print("Select an option: ");
 
-	public void InstructorRegister(String name, String phoneNumber) {
-	}
+            try {
+                int choice = scanner.nextInt();
+                scanner.nextLine(); // Consume newline
+                switch (choice) {
+                    case 1 -> handleClientLogin(scanner);
+                    case 2 -> handleInstructorLogin(scanner);
+                    case 3 -> handleAdminLogin(scanner);
+                    case 4 -> handleClientRegister(scanner);
+                    case 5 -> handleInstructorRegister(scanner);
+                    case 6 -> {
+                        System.out.println("Closing console...");
+                        running = false;
+                    }
+                    default -> System.out.println("Invalid option. Please try again.");
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input. Please enter a number between 1 and 6.");
+                scanner.nextLine(); // Clear invalid input
+            }
+        }
+        scanner.close();
+    }
 
-	private void handleAdminLogin(Scanner scanner) {
-		System.out.print("Enter your username: ");
-		String username = scanner.nextLine();
-		System.out.print("Enter your password: ");
-		String password = scanner.nextLine();
-		AdminLogin(username, password);
-	}
+    // Helper methods
+    private void handleClientLogin(Scanner scanner) {
+        System.out.print("Enter your name: ");
+        String name = scanner.nextLine();
+        System.out.print("Enter your phone number (###-###-####): ");
+        String phoneNumber = scanner.nextLine();
+        if (isValidPhoneNumber(phoneNumber)) {
+            clientLogin(name, phoneNumber);
+        } else {
+            System.out.println("Invalid phone number format. Please use ###-###-####.");
+        }
+    }
 
-	private void handleClientLogin(Scanner scanner) {
-		System.out.print("Enter your name: ");
-		String name = scanner.nextLine();
-		System.out.print("Enter your phone number (###-###-####): ");
-		String phoneNumber = scanner.nextLine();
-		if (validNumber(phoneNumber)) {
-			ClientLogin(name, phoneNumber);
-		} else {
-			System.out.println("Invalid phone number format. Please use ###-###-####.");
-		}
-	}
+    private void handleInstructorLogin(Scanner scanner) {
+        System.out.print("Enter your name: ");
+        String name = scanner.nextLine();
+        System.out.print("Enter your phone number (###-###-####): ");
+        String phoneNumber = scanner.nextLine();
+        if (isValidPhoneNumber(phoneNumber)) {
+            instructorLogin(name, phoneNumber);
+        } else {
+            System.out.println("Invalid phone number format. Please use ###-###-####.");
+        }
+    }
 
-	private void handleInstructorLogin(Scanner scanner) {
-		System.out.print("Enter your name: ");
-		String name = scanner.nextLine();
-		System.out.print("Enter your phone number (###-###-####): ");
-		String phoneNumber = scanner.nextLine();
-		if (validNumber(phoneNumber)) {
-			InstructorLogin(name, phoneNumber);
-		} else {
-			System.out.println("Invalid phone number format. Please use ###-###-####.");
-		}
-	}
+    private void handleAdminLogin(Scanner scanner) {
+        System.out.print("Enter your username: ");
+        String username = scanner.nextLine();
+        System.out.print("Enter your password: ");
+        String password = scanner.nextLine();
+        adminLogin(username, password);
+    }
 
-	private void handleClientRegister(Scanner scanner) {
-		System.out.print("Enter your name: ");
-		String name = scanner.nextLine();
-		System.out.print("Enter your phone number (###-###-####): ");
-		String phoneNumber = scanner.nextLine();
-		if (!validNumber(phoneNumber)) {
-			System.out.println("Invalid phone number format. Please use ###-###-####.");
-			return; // Exit the method if phone number is invalid
-		}
+    private void handleClientRegister(Scanner scanner) {
+        System.out.print("Enter your name: ");
+        String name = scanner.nextLine();
+        System.out.print("Enter your phone number (###-###-####): ");
+        String phoneNumber = scanner.nextLine();
+        if (!isValidPhoneNumber(phoneNumber)) {
+            System.out.println("Invalid phone number format. Please use ###-###-####.");
+            return;
+        }
 
-		System.out.print("Enter your age: ");
-		int age = 0;
-		boolean validAge = false;
+        int age = getValidAge(scanner);
+        clientRegister(name, phoneNumber, age);
+    }
 
-		// Loop until a valid age is entered
-		while (!validAge) {
-			try {
-				age = Integer.parseInt(scanner.nextLine());
-				if (age > 0) {
-					validAge = true; // Set to true if age is valid
-				} else {
-					System.out.println("Please enter a positive integer for age.");
-				}
-			} catch (NumberFormatException e) {
-				System.out.println("Invalid input. Please enter a valid age.");
-			}
-		}
+    private void handleInstructorRegister(Scanner scanner) {
+        System.out.print("Enter your name: ");
+        String name = scanner.nextLine();
+        System.out.print("Enter your phone number (###-###-####): ");
+        String phoneNumber = scanner.nextLine();
+        if (isValidPhoneNumber(phoneNumber)) {
+            instructorRegister(name, phoneNumber);
+        } else {
+            System.out.println("Invalid phone number format. Please use ###-###-####.");
+        }
+    }
 
-		// Call ClientRegister with name, phone number, and age
-		ClientRegister(name, phoneNumber, age);
-	}
+    private int getValidAge(Scanner scanner) {
+        int age = -1;
+        while (age <= 0) {
+            System.out.print("Enter your age: ");
+            try {
+                age = Integer.parseInt(scanner.nextLine());
+                if (age <= 0) {
+                    System.out.println("Age must be a positive integer.");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a valid age.");
+            }
+        }
+        return age;
+    }
 
-	private void handleInstructorRegister(Scanner scanner) {
-		System.out.print("Enter your name: ");
-		String name = scanner.nextLine();
-		System.out.print("Enter your phone number (###-###-####): ");
-		String phoneNumber = scanner.nextLine();
-		if (validNumber(phoneNumber)) {
-			InstructorRegister(name, phoneNumber);
-		} else {
-			System.out.println("Invalid phone number format. Please use ###-###-####.");
-		}
-	}
-
-	public void consoleMenu() {
-		Scanner scanner = new Scanner(System.in);
-		boolean running = true;
-
-		while (running) {
-			System.out.println("\n==== Console Menu ====");
-			System.out.println("1. Client Login");
-			System.out.println("2. Instructor Login");
-			System.out.println("3. Admin Login");
-			System.out.println("4. Client Register");
-			System.out.println("5. Instructor Register");
-			System.out.println("6. Close Console");
-			System.out.print("Select an option: ");
-
-			int choice = 0;
-
-			try {
-				choice = scanner.nextInt();
-				scanner.nextLine(); // Consume the newline character
-
-				switch (choice) {
-				case 1:
-					handleClientLogin(scanner);
-					break;
-				case 2:
-					handleInstructorLogin(scanner);
-					break;
-				case 3:
-					handleAdminLogin(scanner);
-					break;
-				case 4:
-					handleClientRegister(scanner);
-					break;
-				case 5:
-					handleInstructorRegister(scanner);
-					break;
-				case 6:
-					System.out.println("Closing Console...");
-					running = false;
-					break;
-				default:
-					System.out.println("Invalid option, please try again.");
-					break;
-				}
-			} catch (InputMismatchException e) {
-				System.out.println("Invalid input. Please enter a number between 1 and 6.");
-				scanner.nextLine(); // Clear the invalid input
-			}
-		}
-
-		scanner.close();
-	}
-
-	public boolean validNumber(String number) {
-		String regex = "\\d{3}-\\d{3}-\\d{4}";
-		Pattern pattern = Pattern.compile(regex);
-		Matcher matcher = pattern.matcher(number);
-		return matcher.matches();
-	}
+    // Validate phone number
+    public boolean isValidPhoneNumber(String number) {
+        String regex = "\\d{3}-\\d{3}-\\d{4}";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(number);
+        return matcher.matches();
+    }
 }

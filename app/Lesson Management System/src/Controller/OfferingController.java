@@ -1,112 +1,163 @@
 package Controller;
 
 import java.util.ArrayList;
-
-import Model.Booking;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import Model.LessonType;
 import Model.Location;
 import Model.Offering;
 import Model.Schedule;
+import Database.OfferingDAO;
 
 public class OfferingController {
-	private ArrayList<Offering> offeringCollection;
-	private static OfferingController instance;
+    private static OfferingController instance;
+    private OfferingDAO offeringDAO;
+    private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
-	private OfferingController() {
-		offeringCollection = new ArrayList<>();
-	}
+    private OfferingController() {
+        this.offeringDAO = new OfferingDAO();
+    }
 
-	public static OfferingController getInstance() {
-		if (instance == null) {
-			instance = new OfferingController();
-		}
-		return instance;
-	}
+    public static OfferingController getInstance() {
+        if (instance == null) {
+            instance = new OfferingController();
+        }
+        return instance;
+    }
 
-	public boolean createOffering(Location location, Schedule schedule, int startTime, int endTime, boolean isGroup,
-			int capacity, LessonType lessonType) {
-		if (!validate(location, schedule, startTime, endTime)) {
-			return false; // Return false if an overlapping offering exists
-		}
+    // Method to create a new offering
+    public boolean createOffering(Location location, Schedule schedule, int startTime, int endTime, boolean isGroup,
+                                  int capacity, LessonType lessonType) {
+        lock.writeLock().lock(); // Acquire write lock
+        try {
+            if (!validate(location, schedule, startTime, endTime)) {
+                return false; // Return false if an overlapping offering exists
+            }
 
-		Offering newOffering = new Offering(lessonType, isGroup, capacity, startTime, endTime, schedule, location);
-		schedule.addOffering(newOffering);
-		offeringCollection.add(newOffering);
-		return true;
-	}
+            Offering newOffering = new Offering(lessonType, isGroup, capacity, startTime, endTime, schedule, location);
+            schedule.addOffering(newOffering); // Add to schedule
+            offeringDAO.addOffering(newOffering); // Persist in the database
+            return true;
+        } finally {
+            lock.writeLock().unlock(); // Release write lock
+        }
+    }
 
-	public boolean validate(Location location, Schedule schedule, int startTime, int endTime) {
-		return !find(location, schedule, startTime, endTime); // Return true if no conflicts are found
-	}
+    // Helper method to validate that no overlapping offerings exist
+    private boolean validate(Location location, Schedule schedule, int startTime, int endTime) {
+        return !find(location, schedule, startTime, endTime); // Return true if no conflicts are found
+    }
 
-	private boolean find(Location location, Schedule schedule, int startTime, int endTime) {
-		for (Offering offering : offeringCollection) {
-			if (offering.equals(location, schedule, startTime, endTime)) {
-				return true;
-			}
-		}
-		return false; // No matching offering found
-	}
+    // Private helper method to find overlapping offerings
+    private boolean find(Location location, Schedule schedule, int startTime, int endTime) {
+        for (Offering offering : offeringDAO.getAllOfferings()) {
+            if (offering.equals(location, schedule, startTime, endTime)) {
+                return true;
+            }
+        }
+        return false; // No matching offering found
+    }
 
-	public ArrayList<Offering> getOfferingCollection() {
-		return offeringCollection;
-	}
+    // Retrieve all offerings
+    public ArrayList<Offering> getOfferingCollection() {
+        lock.readLock().lock(); // Acquire read lock
+        try {
+            return new ArrayList<>(offeringDAO.getAllOfferings());
+        } finally {
+            lock.readLock().unlock(); // Release read lock
+        }
+    }
 
-	public ArrayList<Offering> find(ArrayList<Location> availableLocations, LessonType specialization) {
-		ArrayList<Offering> matchingOfferings = new ArrayList<>();
-		for (Offering offering : offeringCollection) {
-			// Check if the offering's location is in the availableLocations list and
-			// matches the lesson type
-			if (availableLocations.contains(offering.getLocation())
-					&& offering.getLessonType().equals(specialization)) {
-				matchingOfferings.add(offering);
-			}
-		}
-		return matchingOfferings; // Return the list of matching offerings
-	}
+    // Find offerings based on location and lesson type
+    public ArrayList<Offering> find(ArrayList<Location> availableLocations, LessonType specialization) {
+        lock.readLock().lock(); // Acquire read lock
+        try {
+            ArrayList<Offering> matchingOfferings = new ArrayList<>();
+            for (Offering offering : offeringDAO.getAllOfferings()) {
+                if (availableLocations.contains(offering.getLocation())
+                        && offering.getLessonType().equals(specialization)) {
+                    matchingOfferings.add(offering);
+                }
+            }
+            return matchingOfferings;
+        } finally {
+            lock.readLock().unlock(); // Release read lock
+        }
+    }
 
-	public boolean available(Offering offering) {
-		return !offering.hasInstructor(); // True if there is no instructor assigned
-	}
+    // Check if an offering has an instructor
+    public boolean available(Offering offering) {
+        lock.readLock().lock(); // Acquire read lock
+        try {
+            return !offering.hasInstructor(); // True if there is no instructor assigned
+        } finally {
+            lock.readLock().unlock(); // Release read lock
+        }
+    }
 
-//FUNCTIONALITIES REGARDING THE INSTRUCTOR AND FINDING THEIR POTENTIAL OFFERINGS
-	public ArrayList<Offering> findPotentialOfferings(ArrayList<String> cities, LessonType lessonType) { // Location[]
-																											// locations
-		ArrayList<Offering> potOfferings = new ArrayList<Offering>();
-		// for each offer in the arrayList "offerings" (which serves as the temporary
-		// database for all offerings)
-		for (Offering offer : offeringCollection) {
-			// for each of the locations that the instructor can work in
-			for (String city : cities) {
-				if (offer.equalsforFindingOfferings(city, lessonType)) {
-					potOfferings.add(offer);
-				}
-			}
-		}
-		return potOfferings;
-	}
+    // Find potential offerings for instructors based on cities and lesson type
+    public ArrayList<Offering> findPotentialOfferings(ArrayList<String> cities, LessonType specialization) {
+        lock.readLock().lock(); // Acquire read lock
+        try {
+            ArrayList<Offering> potentialOfferings = new ArrayList<>();
+            for (Offering offer : offeringDAO.getAllOfferings()) {
+                // Check if the offering's city and lesson type match instructor's criteria
+                if (cities.contains(offer.getLocation().getCity()) && offer.getLessonType().equals(specialization)) {
+                    potentialOfferings.add(offer);
+                }
+            }
+            return potentialOfferings;
+        } finally {
+            lock.readLock().unlock(); // Release read lock
+        }
+    }
 
-	//logic for viewing offerings by the client
-	public ArrayList<Offering> viewPublicOfferings(){
-		//create the object that will be returned
-		ArrayList<Offering> publicOfferings = new ArrayList<Offering>();
-		//check if each offering has an instructor, if it does, add it to the collection
-		for(Offering of : offeringCollection){
-			if(of.hasInstructor()){
-				publicOfferings.add(of);
-			}
-		}
-		return publicOfferings; //return the collection.
-	}
+    // View public offerings that have an instructor assigned
+    public ArrayList<Offering> viewPublicOfferings() {
+        lock.readLock().lock(); // Acquire read lock
+        try {
+            ArrayList<Offering> publicOfferings = new ArrayList<>();
+            for (Offering offering : offeringDAO.getAllOfferings()) {
+                if (offering.hasInstructor()) {
+                    publicOfferings.add(offering);
+                }
+            }
+            return publicOfferings;
+        } finally {
+            lock.readLock().unlock(); // Release read lock
+        }
+    }
 
-	//checks if the offering has space for bookings.
-	//if the capacity is bigger than the number of bookings, then that means it's not full.
-	public boolean isFull(Offering of){
-		//return !(of.getCapacity() > of.getBookings().size());
-		return !(of.getCapacity() > 0);
-	}
+    // Check if an offering is fully booked
+    public boolean isFull(Offering offering) {
+        lock.readLock().lock(); // Acquire read lock
+        try {
+            return !(offering.getCapacity() > 0); // Returns true if capacity is 0 or less
+        } finally {
+            lock.readLock().unlock(); // Release read lock
+        }
+    }
 
-	public void decrementCapacity(Offering of){
-		of.spotFilled();
-	}
-}// end of class
+    // Decrease the capacity of an offering when a new booking is made
+    public void decrementCapacity(Offering offering) {
+        lock.writeLock().lock(); // Acquire write lock
+        try {
+            offering.spotFilled();
+            offeringDAO.updateOfferingCapacity(offering.getId(), offering.getCapacity()); // Persist change
+        } finally {
+            lock.writeLock().unlock(); // Release write lock
+        }
+    }
+
+    public void incrementCapacity(Offering offering) {
+        lock.writeLock().lock(); // Acquire write lock
+        try {
+            offering.incrementCapacity();
+            offeringDAO.updateOfferingCapacity(offering.getId(), offering.getCapacity()); // Persist change
+        } finally {
+            lock.writeLock().unlock(); // Release write lock
+        }
+    }
+
+
+    
+}

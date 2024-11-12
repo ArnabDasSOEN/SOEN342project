@@ -1,16 +1,26 @@
 package Model;
 
 public class Booking {
+	private int id; // Unique identifier
 	private String bookingDate;
 	private boolean status;
 	private Client client;
 	private Offering offering;
 
 	public Booking(String bookingDate, boolean status, Client client, Offering offering) {
+		this.id = 0; // Default value indicating ID not set
 		this.bookingDate = bookingDate;
 		this.status = status;
 		this.client = client;
 		this.offering = offering;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	public String getBookingDate() {

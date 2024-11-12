@@ -3,16 +3,27 @@ package Model;
 import java.util.ArrayList;
 
 public class Client {
+	private int id; // Unique identifier
 	private String name;
 	private String phoneNumber;
 	private int age;
 	private ArrayList<Booking> bookings;
+	private Client guardian;
 
 	public Client(String name, String phoneNumber, int age) {
+		this.id = 0;
 		this.name = name;
 		this.phoneNumber = phoneNumber;
 		this.age = age;
 		this.bookings = new ArrayList<>();
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	public String getName() {
@@ -70,5 +81,23 @@ public class Client {
 		//if no matching booking was found, then return false.
 		return false;
 	}
+	 public Client getGuardian() {
+	        return guardian;
+	    }
+
+	    public void setGuardian(Client guardian) {
+	        this.guardian = guardian;
+	    }
+
+	    // OCL Constraint Implementation
+	    public boolean validateGuardian() {
+	        return this.age >= 18 || (this.guardian != null && this.guardian.getAge() >= 18);
+	    }
+
+	    // Override `toString` to indicate the guardian relationship
+	    @Override
+	    public String toString() {
+	        return name + " (Age: " + age + (guardian != null ? ", Guardian: " + guardian.getName() : "") + ")";
+	    }
 
 }
