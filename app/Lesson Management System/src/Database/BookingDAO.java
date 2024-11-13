@@ -33,13 +33,39 @@ public class BookingDAO {
 
 	public void addBooking(Booking booking) {
 		String sql = "INSERT INTO Booking (booking_date, status, client_id, offering_id) VALUES (?, ?, ?, ?)";
-		try (Connection conn = DatabaseConnection.connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+		try (Connection conn = DatabaseConnection.connect();
+				PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+			int clientId = booking.getClient().getId();
+			int offeringId = booking.getOffering().getId();
+
+			System.out.println(
+					"Attempting to add booking with client_id: " + clientId + " and offering_id: " + offeringId);
+
+			// Verify foreign key references exist
+			if (!clientDAO.clientExistsById(clientId) || !offeringDAO.offeringExistsById(offeringId)) {
+				throw new SQLException("Client or Offering does not exist for this booking.");
+			}
 
 			pstmt.setString(1, booking.getBookingDate());
 			pstmt.setBoolean(2, booking.isStatus());
-			pstmt.setInt(3, booking.getClient().getId());
-			pstmt.setInt(4, booking.getOffering().getId());
-			pstmt.executeUpdate();
+			pstmt.setInt(3, clientId);
+			pstmt.setInt(4, offeringId);
+
+			int affectedRows = pstmt.executeUpdate();
+			if (affectedRows == 0) {
+				throw new SQLException("Failed to insert booking into the database.");
+			}
+
+			try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+				if (generatedKeys.next()) {
+					int generatedId = generatedKeys.getInt(1);
+					booking.setId(generatedId);
+					System.out.println("Booking added to database with ID: " + generatedId);
+				} else {
+					throw new SQLException("Failed to retrieve booking ID.");
+				}
+			}
 		} catch (SQLException e) {
 			System.out.println("Error adding booking: " + e.getMessage());
 		}
@@ -98,38 +124,35 @@ public class BookingDAO {
 	}
 
 	public void deleteBooking(Booking booking) {
-	    String sql = "DELETE FROM Booking WHERE id = ?";
-	    try (Connection conn = DatabaseConnection.connect();
-	         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+		String sql = "DELETE FROM Booking WHERE id = ?";
+		try (Connection conn = DatabaseConnection.connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-	        pstmt.setInt(1, booking.getId());
-	        pstmt.executeUpdate();
-	        System.out.println("Booking deleted successfully: " + booking.getId());
-	    } catch (SQLException e) {
-	        System.out.println("Error deleting booking: " + e.getMessage());
-	    }
+			pstmt.setInt(1, booking.getId());
+			pstmt.executeUpdate();
+			System.out.println("Booking deleted successfully: " + booking.getId());
+		} catch (SQLException e) {
+			System.out.println("Error deleting booking: " + e.getMessage());
+		}
 	}
 
 	public ArrayList<Booking> getBookingsByClientId(int clientId) {
-	    String sql = "SELECT * FROM Booking WHERE client_id = ?";
-	    ArrayList<Booking> bookings = new ArrayList<>();
+		String sql = "SELECT * FROM Booking WHERE client_id = ?";
+		ArrayList<Booking> bookings = new ArrayList<>();
 
-	    try (Connection conn = DatabaseConnection.connect();
-	         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+		try (Connection conn = DatabaseConnection.connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-	        pstmt.setInt(1, clientId);
-	        ResultSet rs = pstmt.executeQuery();
+			pstmt.setInt(1, clientId);
+			ResultSet rs = pstmt.executeQuery();
 
-	        while (rs.next()) {
-	            Booking booking = mapResultSetToBooking(rs);
-	            bookings.add(booking);
-	        }
-	    } catch (SQLException e) {
-	        System.out.println("Error retrieving bookings for client ID: " + e.getMessage());
-	    }
-	    return bookings;
+			while (rs.next()) {
+				Booking booking = mapResultSetToBooking(rs);
+				bookings.add(booking);
+			}
+		} catch (SQLException e) {
+			System.out.println("Error retrieving bookings for client ID: " + e.getMessage());
+		}
+		return bookings;
 	}
-
 
 	public boolean bookingExists(Offering offering, Client client) {
 		String sql = "SELECT COUNT(*) FROM Booking WHERE client_id = ? AND offering_id = ?";
@@ -144,5 +167,21 @@ public class BookingDAO {
 			return false;
 		}
 	}
-	
+
+	public Booking getBookingById(int id) {
+		String sql = "SELECT * FROM Booking WHERE id = ?";
+		try (Connection conn = DatabaseConnection.connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+			pstmt.setInt(1, id);
+			ResultSet rs = pstmt.executeQuery();
+
+			if (rs.next()) {
+				return mapResultSetToBooking(rs);
+			}
+		} catch (SQLException e) {
+			System.out.println("Error retrieving booking by ID: " + e.getMessage());
+		}
+		return null; // Return null if no booking is found with the given ID
+	}
+
 }

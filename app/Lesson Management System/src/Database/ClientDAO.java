@@ -74,16 +74,32 @@ public class ClientDAO {
 
 	public void addClientWithGuardian(Client minorClient, Client guardian) {
 		String sql = "INSERT INTO Client (name, phone_number, age, guardian_id) VALUES (?, ?, ?, ?)";
-
-		try (Connection conn = DatabaseConnection.connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+		try (Connection conn = DatabaseConnection.connect();
+				PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
 			pstmt.setString(1, minorClient.getName());
 			pstmt.setString(2, minorClient.getPhoneNumber());
 			pstmt.setInt(3, minorClient.getAge());
 			pstmt.setInt(4, guardian.getId());
-			pstmt.executeUpdate();
+
+			int affectedRows = pstmt.executeUpdate();
+			if (affectedRows == 0) {
+				throw new SQLException("Inserting minor client failed, no rows affected.");
+			}
+
+			// Retrieve and set generated ID
+			try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+				if (generatedKeys.next()) {
+					int generatedId = generatedKeys.getInt(1);
+					minorClient.setId(generatedId); // Set the generated ID on the minor client object
+					System.out.println("Minor client registered with ID: " + generatedId);
+				} else {
+					throw new SQLException("Inserting minor client failed, no ID obtained.");
+				}
+			}
+
 		} catch (SQLException e) {
-			System.out.println("Error adding client with guardian: " + e.getMessage());
+			System.out.println("Error adding minor client with guardian: " + e.getMessage());
 		}
 	}
 
@@ -160,4 +176,18 @@ public class ClientDAO {
 			System.out.println("Error adding client: " + e.getMessage());
 		}
 	}
+
+	public boolean clientExistsById(int clientId) {
+		String sql = "SELECT COUNT(*) FROM Client WHERE id = ?";
+		try (Connection conn = DatabaseConnection.connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+			pstmt.setInt(1, clientId);
+			ResultSet rs = pstmt.executeQuery();
+			return rs.next() && rs.getInt(1) > 0;
+		} catch (SQLException e) {
+			System.out.println("Error checking client existence by ID: " + e.getMessage());
+			return false;
+		}
+	}
+
 }

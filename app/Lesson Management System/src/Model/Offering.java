@@ -15,7 +15,8 @@ public class Offering {
 	private ArrayList<Booking> bookings;
 	private Location location;
 
-	public Offering(LessonType lessonType, boolean isGroup, int capacity, int startTime, int endTime, Schedule schedule, Location location) {
+	public Offering(LessonType lessonType, boolean isGroup, int capacity, int startTime, int endTime, Schedule schedule,
+			Location location) {
 		this.id = 0;
 		this.lessonType = lessonType;
 		this.isGroup = isGroup;
@@ -97,8 +98,13 @@ public class Offering {
 		return instructor;
 	}
 
+	public boolean hasInstructor() {
+		return this.instructor != null;
+	}
+
 	public void setInstructor(Instructor instructor) {
 		this.instructor = instructor;
+		this.setAvailability(instructor != null); // Automatically set availability based on instructor status
 	}
 
 	public ArrayList<Booking> getBookings() {
@@ -117,11 +123,10 @@ public class Offering {
 		this.location = location;
 	}
 
-	//if the offering doesn't have an instructor, then this.instructor == null will evaluate to true. But the name "hasInstructor" means "does it have an instructor" therefor, 
-	//you should negate this value.
-	public boolean hasInstructor() {
-		return !(this.instructor == null);
-	}
+	// if the offering doesn't have an instructor, then this.instructor == null will
+	// evaluate to true. But the name "hasInstructor" means "does it have an
+	// instructor" therefor,
+	// you should negate this value.
 
 	public boolean equals(Location l, Schedule s, int startTime, int endTime) {
 		// Check if the location and schedule match
@@ -141,26 +146,25 @@ public class Offering {
 		return getLocation().getCity() == city && getLessonType() == lstype;
 	}
 
-	public boolean equalsForComparingTwoOfferings(Offering of){
-		return this.getLessonType() == of.getLessonType() && 
-		this.isGroup() == of.isGroup() &&
-		this.isAvailability() == of.isAvailability() &&
-		this.getCapacity() == of.getCapacity() &&
-		this.getStartTime() == of.getStartTime() &&
-		this.getEndTime() == of.getEndTime() &&
-		this.getSchedule().equals(of.getSchedule()) && //check if these equals method are valid
-		this.getInstructor().equals(of.getInstructor()) && //check if these equals method are valid
-		this.getBookings() == of.getBookings() && //need to make an equals method for this (potentially)
-		this.getLocation().equals(of.getLocation()); //check if these equals method are valid
+	public boolean equalsForComparingTwoOfferings(Offering of) {
+		return this.getLessonType() == of.getLessonType() && this.isGroup() == of.isGroup()
+				&& this.isAvailability() == of.isAvailability() && this.getCapacity() == of.getCapacity()
+				&& this.getStartTime() == of.getStartTime() && this.getEndTime() == of.getEndTime()
+				&& this.getSchedule().equals(of.getSchedule()) && // check if these equals method are valid
+				this.getInstructor().equals(of.getInstructor()) && // check if these equals method are valid
+				this.getBookings() == of.getBookings() && // need to make an equals method for this (potentially)
+				this.getLocation().equals(of.getLocation()); // check if these equals method are valid
 	}
 
-	public void spotFilled(){
+	public void spotFilled() {
 		this.setCapacity(this.getCapacity() - 1);
 	}
 
-	public String toString(){
-		return "Lesson type: " + this.getLessonType() + " in group: " + this.isGroup() + " capacity left: " + this.getCapacity() + " from: " + this.getStartTime() +
-		" to " + this.getEndTime() + " on " + this.getSchedule().toStringForAnnotation() + " with: " + this.getInstructor().getName() + " in " + this.getLocation().toString();
+	@Override
+	public String toString() {
+		String instructorName = (getInstructor() != null) ? getInstructor().getName() : "No Instructor Assigned";
+		return "Offering Details: " + "Lesson Type: " + lessonType + ", Group: " + isGroup + ", Capacity: " + capacity
+				+ ", Start Time: " + startTime + ", End Time: " + endTime + ", Instructor: " + instructorName;
 	}
 
 	public void incrementCapacity() {

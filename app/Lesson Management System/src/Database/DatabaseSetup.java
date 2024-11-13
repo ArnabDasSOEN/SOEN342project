@@ -72,16 +72,18 @@ public class DatabaseSetup {
             // Insert Sample Schedules
             String insertSchedules = """
                     INSERT INTO Schedule (start_date, end_date, day_of_week, start_time, end_time, location_id) VALUES
-                    ('2023-09-01', '2023-12-01', 1, '09:00', '11:00', 1),
-                    ('2023-09-01', '2023-12-01', 2, '10:00', '12:00', 2);
+                    ('2023-09-01', '2023-12-01', 1, '09:00', '20:00', 1),
+                    ('2023-09-01', '2023-12-01', 2, '10:00', '20:00', 2);
                     """;
             stmt.execute(insertSchedules);
 
             // Insert Sample Offerings with Enum Matching Lesson Types
             String insertOfferings = """
                     INSERT INTO Offering (lesson_type, is_group, availability, capacity, start_time, end_time, has_instructor, instructor_id, schedule_id, location_id) VALUES
-                    ('YOGA', 1, 1, 20, '09:00', '11:00', 1, 1, 1, 1),
-                    ('DANCE', 0, 1, 10, '10:00', '12:00', 1, 2, 2, 2);
+                    ('YOGA', 1, 1, 20, '09:00', '11:00', 1, 1, 1, 1),  -- Offering with instructor
+                    ('DANCE', 0, 1, 10, '10:00', '12:00', 1, 2, 2, 2),  -- Offering with instructor
+                    ('YOGA', 0, 1, 1, '13:00', '15:00', 0, NULL, 1, 1),  -- Offering without instructor
+                    ('DANCE', 1, 1, 30, '14:00', '16:00', 0, NULL, 2, 2);  -- Another offering without instructor
                     """;
             stmt.execute(insertOfferings);
 
@@ -195,7 +197,7 @@ public class DatabaseSetup {
                 "capacity INTEGER," +
                 "start_time TEXT," +
                 "end_time TEXT," +
-                "has_instructor BOOLEAN," +
+                "has_instructor BOOLEAN DEFAULT 0," +
                 "instructor_id INTEGER," +
                 "schedule_id INTEGER," +
                 "location_id INTEGER," +

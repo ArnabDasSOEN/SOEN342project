@@ -18,6 +18,8 @@ public class Instructor {
 		this.phoneNumber = phoneNumber;
 		this.startDate = startDate;
 		this.endDate = endDate;
+		this.offerings = new ArrayList<>(); // Initialize offerings to avoid NullPointerException
+		this.availabilities = new ArrayList<>(); // Initialize availabilities if it's used similarly
 	}
 
 	public int getId() {
@@ -27,12 +29,13 @@ public class Instructor {
 	public void setId(int id) {
 		this.id = id;
 	}
+
 	public LessonType getSpecialization() {
 		return specialization;
 	}
 
 	public void setSpecialization(String specialization2) {
-		
+
 		this.specialization = LessonType.valueOf(specialization2);
 	}
 
@@ -68,18 +71,18 @@ public class Instructor {
 		this.endDate = endDate;
 	}
 
-	 public ArrayList<String> getAvailabilities() {
-	        return availabilities;
-	    }
+	public ArrayList<String> getAvailabilities() {
+		return availabilities;
+	}
 
-	    public void setAvailabilities(ArrayList<String> availabilities) {
-	        this.availabilities = availabilities;
-	    }
+	public void setAvailabilities(ArrayList<String> availabilities) {
+		this.availabilities = availabilities;
+	}
 
-	    // Check if a city is in the instructor's availabilities
-	    public boolean isCityAvailable(String city) {
-	        return availabilities.contains(city);
-	    }
+	// Check if a city is in the instructor's availabilities
+	public boolean isCityAvailable(String city) {
+		return availabilities.contains(city);
+	}
 
 	public ArrayList<Offering> getOfferings() {
 		return offerings;
@@ -89,14 +92,16 @@ public class Instructor {
 		this.offerings = offerings;
 	}
 
-	public void assignOffering(Offering offering){
+	public void assignOffering(Offering offering) {
 		this.offerings.add(offering);
 	}
 
-	public boolean equals(Instructor ins){
-		return this.getSpecialization() == ins.getSpecialization() && this.getName().equalsIgnoreCase(ins.getName()) && this.getPhoneNumber().equalsIgnoreCase(ins.getPhoneNumber()) &&
-		this.getStartDate().equalsIgnoreCase(ins.getStartDate()) && this.getEndDate().equalsIgnoreCase(ins.getEndDate()) && this.getAvailabilities() == ins.getAvailabilities()
-		&& this.getOfferings() == ins.getOfferings();
+	public boolean equals(Instructor ins) {
+		return this.getSpecialization() == ins.getSpecialization() && this.getName().equalsIgnoreCase(ins.getName())
+				&& this.getPhoneNumber().equalsIgnoreCase(ins.getPhoneNumber())
+				&& this.getStartDate().equalsIgnoreCase(ins.getStartDate())
+				&& this.getEndDate().equalsIgnoreCase(ins.getEndDate())
+				&& this.getAvailabilities() == ins.getAvailabilities() && this.getOfferings() == ins.getOfferings();
 	}
 
 }// end of class
