@@ -6,8 +6,16 @@
 
 ### Preconditions
 - the client is viewing all available offerings
-- the client has selected an offering to book
+- the client has selected a valid offering which exists in the system to book
+- the client has not already booked the same offering selected
 - the offering which the client has chosen does not overlap with another booking the client has previously made
 
 ### Postconditions
-- the
+- if the offering capacity is not full
+  - decremenent the current capacity of the offering by 1
+  - a new instance of booking is created with attributes "offering" and "client" which associated the offering with the client
+  - the newly instanciated booking is added to the system 
+  - the booking is added to the client's account
+
+-if the offering capacity is full
+  -notify the client that the offering is unavailable due to being full
