@@ -65,6 +65,10 @@ public class BookingController {
 			lock.readLock().unlock();
 		}
 	}
+	public boolean hasConflictingBooking(Client client, int startTime, int endTime, int dayOfWeek) {
+	    return bookingDAO.hasConflictingBooking(client, startTime, endTime, dayOfWeek);
+	}
+
 
 	public void createBooking(Offering offering, Client loggedInClient, Client guardian) {
 		lock.writeLock().lock();
@@ -112,17 +116,19 @@ public class BookingController {
 
 	// Helper method to validate booking conditions for both minors and adults
 	private boolean validateBookingForClient(Offering offering, Client client, Client guardian) {
+	    if (checkBookingAvailability(offering, client)) {
+	        System.out.println("Booking error: The client has already booked this offering or it is unavailable.");
+	        return false;
+	    }
+	    if (offering.getCapacity() <= 0) {
+	        System.out.println("Booking error: The offering is fully booked.");
+	        return false;
+	    }
 
-		if (checkBookingAvailability(offering, client)) {
-			System.out.println("Booking error: The client has already booked this offering or it is unavailable.");
-			return false;
-		}
-		if (offering.getCapacity() <= 0) {
-			System.out.println("Booking error: The offering is fully booked.");
-			return false;
-		}
-		return true;
+	    return true;
 	}
+
+
 
 	// Helper method to generate a booking date string
 	private String getBookingDateString(Offering offering) {

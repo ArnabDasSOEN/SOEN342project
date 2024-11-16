@@ -149,7 +149,6 @@ public class InstructorConsole extends JFrame implements Runnable {
 		Instructor instructor = IC.getInstructor();
 		if (OC.available(offering) && instructor != null) { // Check if available and instructor is logged in
 			OC.assignInstructorToOffering(offering, instructor); // Assign instructor to offering
-			offering.setInstructor(instructor); // Set the instructor in memory
 			instructor.assignOffering(offering); // Add offering to instructor’s list
 			outputArea.append("Offering successfully assigned to you.\n");
 		} else {

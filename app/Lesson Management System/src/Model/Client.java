@@ -97,7 +97,12 @@ public class Client {
 	    // Override `toString` to indicate the guardian relationship
 	    @Override
 	    public String toString() {
-	        return name + " (Age: " + age + (guardian != null ? ", Guardian: " + guardian.getName() : "") + ")";
+	        return name 
+	               + " (Age: " + age 
+	               + (guardian != null ? ", Guardian: " + guardian.getName() : "") 
+	               + ", Phone: " + phoneNumber 
+	               + ")";
 	    }
+
 
 }

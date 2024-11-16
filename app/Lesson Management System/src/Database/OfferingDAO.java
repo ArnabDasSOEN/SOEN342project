@@ -156,15 +156,16 @@ public class OfferingDAO {
 	}
 
 	public void assignInstructorToOffering(int offeringId, int instructorId) {
-		String sql = "UPDATE Offering SET instructor_id = ?, availability = ? WHERE id = ?";
-		try (Connection conn = DatabaseConnection.connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
-			pstmt.setInt(1, instructorId); // Set instructor_id
-			pstmt.setBoolean(2, true); // Set availability to true (or adjust based on your logic)
-			pstmt.setInt(3, offeringId); // The offering to update
-			pstmt.executeUpdate(); // Execute the update
-		} catch (SQLException e) {
-			System.out.println("Error updating offering with instructor: " + e.getMessage());
-		}
+	    String sql = "UPDATE Offering SET instructor_id = ?, availability = ?, has_instructor = ? WHERE id = ?";
+	    try (Connection conn = DatabaseConnection.connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+	        pstmt.setInt(1, instructorId); // Set instructor_id
+	        pstmt.setBoolean(2, true); // Set availability to true (or adjust based on your logic)
+	        pstmt.setBoolean(3, true); // Set has_instructor to true
+	        pstmt.setInt(4, offeringId); // The offering to update
+	        pstmt.executeUpdate(); // Execute the update
+	    } catch (SQLException e) {
+	        System.out.println("Error updating offering with instructor: " + e.getMessage());
+	    }
 	}
 
 	public boolean offeringExistsById(int offeringId) {

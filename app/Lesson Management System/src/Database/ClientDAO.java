@@ -43,22 +43,58 @@ public class ClientDAO {
 	}
 
 	private Client extractClientFromResultSet(ResultSet rs) throws SQLException {
-		int id = rs.getInt("id");
-		String name = rs.getString("name");
-		String phoneNumber = rs.getString("phone_number");
-		int age = rs.getInt("age");
-		int guardianId = rs.getInt("guardian_id");
+	    int id = rs.getInt("id");
+	    String name = rs.getString("name");
+	    String phoneNumber = rs.getString("phone_number");
+	    int age = rs.getInt("age");
+	    int guardianId = rs.getInt("guardian_id");
 
-		Client client = new Client(name, phoneNumber, age);
-		client.setId(id);
+	    Client client = new Client(name, phoneNumber, age);
+	    client.setId(id);
 
-		if (guardianId > 0) {
-			Client guardian = getClientById(guardianId);
-			client.setGuardian(guardian);
-		}
-
-		return client;
+	    if (guardianId > 0) {
+	        client.setGuardian(new ClientDAO().getClientById(guardianId, false)); // Avoid recursive load
+	    }
+	    return client;
 	}
+
+
+	public Client getClientById(int guardianId, boolean loadBookings) {
+	    String sql = "SELECT * FROM Client WHERE id = ?";
+	    try (Connection conn = DatabaseConnection.connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+	        pstmt.setInt(1, guardianId);
+	        ResultSet rs = pstmt.executeQuery();
+
+	        if (rs.next()) {
+	            // Create a Client object with basic data
+	            int id = rs.getInt("id");
+	            String name = rs.getString("name");
+	            String phoneNumber = rs.getString("phone_number");
+	            int age = rs.getInt("age");
+	            int guardianIdField = rs.getInt("guardian_id");
+
+	            Client client = new Client(name, phoneNumber, age);
+	            client.setId(id);
+
+	            // Load guardian only if it is different from the current client to prevent recursion
+	            if (guardianIdField > 0 && guardianIdField != guardianId) {
+	                client.setGuardian(getClientById(guardianIdField, false)); // Do not load bookings for the guardian
+	            }
+
+	            // Load bookings only if loadBookings flag is true
+	            if (loadBookings) {
+	                client.setBookings(getBookingDAO().getBookingsByClientId(id, false)); // Do not load clients within bookings
+	            }
+
+	            return client;
+	        }
+	    } catch (SQLException e) {
+	        System.out.println("Error retrieving client by ID: " + e.getMessage());
+	    }
+	    return null; // Return null if client not found
+	}
+
 
 	public void deleteClient(Client client) {
 		String sql = "DELETE FROM Client WHERE id = ?";
@@ -118,49 +154,31 @@ public class ClientDAO {
 		}
 	}
 
-	public Client getClientById(int id, boolean loadBookings) {
-		String sql = "SELECT * FROM Client WHERE id = ?";
-		try (Connection conn = DatabaseConnection.connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+	public Client getClientByNameAndPhone(String name, String phoneNumber) {
+	    String sql = "SELECT * FROM Client WHERE name = ? AND phone_number = ?";
+	    try (Connection conn = DatabaseConnection.connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-			pstmt.setInt(1, id);
-			ResultSet rs = pstmt.executeQuery();
+	        pstmt.setString(1, name);
+	        pstmt.setString(2, phoneNumber);
+	        ResultSet rs = pstmt.executeQuery();
 
-			if (rs.next()) {
-				Client client = extractClientFromResultSet(rs);
-				// Load bookings only if the flag is true
-				if (loadBookings) {
-					client.setBookings(getBookingDAO().getBookingsByClientId(id, false)); // prevent recursive loading
-				}
-				return client;
-			}
-		} catch (SQLException e) {
-			System.out.println("Error retrieving client by ID: " + e.getMessage());
-		}
-		return null;
+	        if (rs.next()) {
+	            Client client = extractClientFromResultSet(rs);
+	            // Load related data
+	            client.setBookings(getBookingDAO().getBookingsByClientId(client.getId()));
+	            return client;
+	        }
+	    } catch (SQLException e) {
+	        System.out.println("Error retrieving client by name and phone: " + e.getMessage());
+	    }
+	    return null;
 	}
 
 	public Client getClientById(int id) {
-		return getClientById(id, true); // Default behavior loads bookings
+	    return getClientById(id, true); // By default, load bookings for the client
 	}
 
-	public Client getClientByNameAndPhone(String name, String phoneNumber) {
-		String sql = "SELECT * FROM Client WHERE name = ? AND phone_number = ?";
-		try (Connection conn = DatabaseConnection.connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-			pstmt.setString(1, name);
-			pstmt.setString(2, phoneNumber);
-			ResultSet rs = pstmt.executeQuery();
-
-			if (rs.next()) {
-				Client client = extractClientFromResultSet(rs);
-				client.setBookings(getBookingDAO().getBookingsByClientId(client.getId(), false));
-				return client;
-			}
-		} catch (SQLException e) {
-			System.out.println("Error retrieving client by name and phone: " + e.getMessage());
-		}
-		return null;
-	}
 
 	// Add a new client without a guardian
 	public void addClient(Client newClient) {

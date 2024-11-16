@@ -45,10 +45,12 @@ public class Console {
 	// Register client
 	public void clientRegister(String name, String phoneNumber, int age) {
 		ClientConsole clientConsole = new ClientConsole();
-		if (clientConsole.registerNormal(name, phoneNumber, age)) {
-			System.out.println("Successfully registered new client.");
-		} else {
+		if (age < 18) {
+			System.out.println("Minors can only be registered through a guardian.\n");
+		} else if(!(clientConsole.registerNormal(name, phoneNumber, age))){
 			System.out.println("Account already exists.");
+		} else {
+			System.out.println("Register Successful");
 		}
 	}
 

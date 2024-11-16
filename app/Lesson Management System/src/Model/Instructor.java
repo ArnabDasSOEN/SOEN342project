@@ -93,7 +93,13 @@ public class Instructor {
 	}
 
 	public void assignOffering(Offering offering) {
-		this.offerings.add(offering);
+	    if (offering == null) {
+	        System.out.println("Attempted to assign a null offering.");
+	    } else {
+	        this.offerings.add(offering);
+	        System.out.println("Offering assigned: " + offering);
+	        System.out.println("Current offerings: " + offerings);
+	    }
 	}
 
 	public boolean equals(Instructor ins) {
@@ -103,5 +109,19 @@ public class Instructor {
 				&& this.getEndDate().equalsIgnoreCase(ins.getEndDate())
 				&& this.getAvailabilities() == ins.getAvailabilities() && this.getOfferings() == ins.getOfferings();
 	}
+	@Override
+	public String toString() {
+	    StringBuilder sb = new StringBuilder();
+	    sb.append("Instructor ID: ").append(id)
+	      .append("\nName: ").append(name)
+	      .append("\nPhone: ").append(phoneNumber)
+	      .append("\nSpecialization: ").append(specialization != null ? specialization : "Not Assigned")
+	      .append("\nStart Date: ").append(startDate)
+	      .append("\nEnd Date: ").append(endDate)
+	      .append("\nAvailabilities: ").append(availabilities.isEmpty() ? "None" : String.join(", ", availabilities))
+	      .append("\nOfferings: ").append(offerings.isEmpty() ? "None" : offerings.size() + " offerings assigned");
+	    return sb.toString();
+	}
+
 
 }// end of class

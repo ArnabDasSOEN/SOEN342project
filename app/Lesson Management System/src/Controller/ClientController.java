@@ -40,14 +40,26 @@ public class ClientController {
     public Client login(String name, String phoneNumber) {
         lock.readLock().lock();
         try {
+            // Check if the client exists in memory
             for (Client client : clientCollection) {
-                if (client.clientExists(name, phoneNumber)) {
+                if (client.getName().equals(name) && client.getPhoneNumber().equals(phoneNumber)) {
                     return client;
                 }
             }
-            return clientDAO.getClientByNameAndPhone(name, phoneNumber);
         } finally {
             lock.readLock().unlock();
+        }
+
+        // If not found in memory, fetch from the database
+        lock.writeLock().lock();
+        try {
+            Client clientFromDB = clientDAO.getClientByNameAndPhone(name, phoneNumber);
+            if (clientFromDB != null) {
+                clientCollection.add(clientFromDB);
+            }
+            return clientFromDB; // Will be null if login fails
+        } finally {
+            lock.writeLock().unlock();
         }
     }
 

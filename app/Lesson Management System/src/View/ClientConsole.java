@@ -173,16 +173,33 @@ public class ClientConsole extends JFrame implements Runnable {
 	}
 
 	private void bookOffering(Offering offering) {
-		if (BC.checkBookingAvailability(offering, loggedInClient)) {
-			outputArea.append("Already booked this offering or it's unavailable.\n");
-		} else if (OC.isFull(offering)) {
-			outputArea.append("Offering is full.\n");
-		} else {
-			OC.decrementCapacity(offering);
-			BC.createBooking(offering, loggedInClient);
-			outputArea.append("Booked successfully.\n");
-		}
+	    // Check if the client has already booked the offering or if it's unavailable
+	    if (BC.checkBookingAvailability(offering, loggedInClient)) {
+	        outputArea.append("Already booked this offering or it's unavailable.\n");
+	        return;
+	    }
+
+	    // Check if the offering is full
+	    if (OC.isFull(offering)) {
+	        outputArea.append("Offering is full.\n");
+	        return;
+	    }
+
+	    // Check for conflicting bookings on the same day and time slot
+	    int dayOfWeek = offering.getSchedule().getDayOfWeek();
+	    boolean hasConflict = BC.hasConflictingBooking(loggedInClient, offering.getStartTime(), offering.getEndTime(), dayOfWeek);
+
+	    if (hasConflict) {
+	        outputArea.append("Booking error: The client already has a booking at the same time on this day of the week.\n");
+	        return;
+	    }
+
+	    // Proceed to create the booking if all checks pass
+	    OC.decrementCapacity(offering);
+	    BC.createBooking(offering, loggedInClient);
+	    outputArea.append("Booked successfully.\n");
 	}
+
 
 	private void handleViewBookings() {
 		ArrayList<Booking> bookings = BC.getBookingsByClient(loggedInClient);
@@ -269,10 +286,6 @@ public class ClientConsole extends JFrame implements Runnable {
 	}
 
 	public boolean registerMinor(String name, String phoneNumber, int age, Client guardian) {
-		if (age >= 18) {
-			outputArea.append("Only minors can be registered through a guardian.\n");
-			return false;
-		}
 		if (CC.register(name, phoneNumber, age, guardian)) {
 			outputArea.append("Minor registered successfully under guardian " + guardian.getName() + ".\n");
 			return true;

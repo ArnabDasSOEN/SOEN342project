@@ -171,6 +171,7 @@ public class InstructorDAO {
 		try (Connection conn = DatabaseConnection.connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
 			pstmt.setInt(1, instructorId);
+		
 			ResultSet rs = pstmt.executeQuery();
 
 			while (rs.next()) {

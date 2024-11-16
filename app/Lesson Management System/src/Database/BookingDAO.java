@@ -70,7 +70,34 @@ public class BookingDAO {
 			System.out.println("Error adding booking: " + e.getMessage());
 		}
 	}
+	
+	public boolean hasConflictingBooking(Client client, int startTime, int endTime, int dayOfWeek) {
+	    String sql = "SELECT COUNT(*) FROM Booking b " +
+	                 "JOIN Offering o ON b.offering_id = o.id " +
+	                 "JOIN Schedule s ON o.schedule_id = s.id " +
+	                 "WHERE b.client_id = ? AND s.day_of_week = ? " +
+	                 "AND ((o.start_time < ? AND o.end_time > ?) OR (o.start_time < ? AND o.end_time > ?))";
 
+	    try (Connection conn = DatabaseConnection.connect();
+	         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+	        pstmt.setInt(1, client.getId());
+	        pstmt.setInt(2, dayOfWeek);
+	        pstmt.setInt(3, endTime);      // Compare endTime to the existing offering's start_time
+	        pstmt.setInt(4, startTime);     // Compare startTime to the existing offering's end_time
+	        pstmt.setInt(5, startTime);     // Compare startTime to the existing offering's start_time
+	        pstmt.setInt(6, endTime);       // Compare endTime to the existing offering's end_time
+
+	        ResultSet rs = pstmt.executeQuery();
+	        return rs.next() && rs.getInt(1) > 0;
+	    } catch (SQLException e) {
+	        System.out.println("Error checking conflicting bookings: " + e.getMessage());
+	        return false;
+	    }
+	}
+
+
+	
 	public List<Booking> getAllBookings() {
 		List<Booking> bookings = new ArrayList<>();
 		String sql = "SELECT * FROM Booking";
