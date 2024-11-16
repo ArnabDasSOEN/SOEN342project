@@ -1,0 +1,13 @@
+### Operation Name
+'selectOffering(selectedOfferings)'
+
+### Cross References
+- use Case: "Process Bookings"
+
+### Preconditions
+- the client is viewing all available offerings
+- the client has selected an offering to book
+- the offering which the client has chosen does not overlap with another booking the client has previously made
+
+### Postconditions
+- the
