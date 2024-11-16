@@ -185,7 +185,7 @@ public class Offering {
 	@Override
 	public String toString() {
 		String instructorName = (getInstructor() != null) ? getInstructor().getName() : "No Instructor Assigned";
-		return "Offering Details: " + "Lesson Type: " + lessonType + ", Group: " + isGroup + ", Capacity: " + capacity
+		return "Offering Details: " +" Location: "+this.location.getName() + ", Lesson Type: " + lessonType + ", Group: " + isGroup + ", Capacity: " + capacity
 			+", " +this.getDayOfWeek()	+ ", Start Time: " + startTime + ", End Time: " + endTime + ", Instructor: " + instructorName ;
 	}
 
